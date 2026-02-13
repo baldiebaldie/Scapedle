@@ -41,7 +41,7 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
     return locationToRegion[currentSong.location] || null;
   };
 
-  const handleRegionGuess = (regionId) => {
+  const handleRegionGuess = (regionId, pinLatLng) => {
     const correctRegionId = getCorrectRegionId();
     if (!correctRegionId) return;
 
@@ -57,7 +57,8 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
       temperature: tempResult.temperature,
       message: tempResult.message,
       categoryMatch: tempResult.categoryMatch,
-      category: region?.category
+      category: region?.category,
+      pinLatLng: pinLatLng || null
     };
 
     if (musicMode === 'daily') {
@@ -177,7 +178,7 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
       </div>
 
       <div className="music-game-instructions">
-        <p>Listen to the music and click on the map location where this song unlocks!</p>
+        <p>Listen to the music, place a pin on the map, and confirm your guess!</p>
       </div>
 
       {songWon ? (

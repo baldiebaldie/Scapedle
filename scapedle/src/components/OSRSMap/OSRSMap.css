@@ -66,6 +66,90 @@
   text-shadow: 1px 1px 2px black;
 }
 
+/* Custom map pin icon */
+.custom-map-pin {
+  background: transparent !important;
+  border: none !important;
+  animation: pinDrop 0.3s ease-out;
+}
+
+@keyframes pinDrop {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Pin confirm bar */
+.pin-confirm-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #1a1d23;
+  border-radius: 12px;
+  border: 2px solid #4caf50;
+}
+
+.pin-confirm-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pin-region-label {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.already-guessed-warning {
+  color: #ff9800;
+  font-size: 12px;
+}
+
+.pin-confirm-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.confirm-guess-btn {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.confirm-guess-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+}
+
+.confirm-guess-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clear-pin-btn {
+  padding: 10px 16px;
+  background: #2a2d33;
+  border: 1px solid #444;
+  border-radius: 8px;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.clear-pin-btn:hover {
+  background: #3a3d43;
+  color: #fff;
+}
+
 /* Special Locations Panel */
 .special-locations-panel {
   background: #1a1d23;
@@ -234,6 +318,12 @@
 
   .osrs-map-container {
     height: 400px;
+  }
+
+  .pin-confirm-bar {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
   }
 
   .temperature-legend {

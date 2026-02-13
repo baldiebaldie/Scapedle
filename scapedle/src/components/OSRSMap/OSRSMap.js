@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MapContainer, TileLayer, Rectangle, Popup, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, CircleMarker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
@@ -11,6 +11,18 @@ import {
   REGION_CATEGORIES
 } from '../../data/mapRegions';
 import './OSRSMap.css';
+
+// Custom pin icon using DivIcon to avoid Leaflet's default icon webpack bundling issues
+const createPinIcon = (color = '#e53935') => L.divIcon({
+  className: 'custom-map-pin',
+  html: `<svg width="24" height="36" viewBox="0 0 24 36" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 24 12 24s12-15 12-24C24 5.4 18.6 0 12 0z" fill="${color}" stroke="#000" stroke-width="1"/>
+    <circle cx="12" cy="12" r="5" fill="white" opacity="0.8"/>
+  </svg>`,
+  iconSize: [24, 36],
+  iconAnchor: [12, 36],
+  popupAnchor: [0, -36]
+});
 
 // OSRS map bounds for regions (in Leaflet coordinates for CRS.Simple)
 // Format: [[south, west], [north, east]] or [[minLat, minLng], [maxLat, maxLng]]
@@ -58,38 +70,50 @@ const regionBounds = {
   wilderness: [[-32, 90], [-8, 118]]
 };
 
-// Custom click handler component
-function MapClickHandler({ onRegionClick, disabled, guessHistory }) {
+// Resolve a lat/lng coordinate to the nearest region ID
+// First checks if the point is inside any region bounds (smaller regions checked first).
+// If not inside any bounds, finds the region whose center is closest.
+function resolveLatLngToRegion(lat, lng) {
+  for (const [regionId, bounds] of Object.entries(regionBounds)) {
+    const [[minLat, minLng], [maxLat, maxLng]] = bounds;
+    if (lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng) {
+      return regionId;
+    }
+  }
+
+  let nearestRegion = null;
+  let nearestDistance = Infinity;
+
+  for (const [regionId, bounds] of Object.entries(regionBounds)) {
+    const [[minLat, minLng], [maxLat, maxLng]] = bounds;
+    const centerLat = (minLat + maxLat) / 2;
+    const centerLng = (minLng + maxLng) / 2;
+    const distance = Math.sqrt((lat - centerLat) ** 2 + (lng - centerLng) ** 2);
+
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearestRegion = regionId;
+    }
+  }
+
+  return nearestRegion;
+}
+
+// Click handler that places a pin on the map
+function MapClickHandler({ onPinPlace, disabled }) {
   useMapEvents({
     click: (e) => {
-      const { lat, lng } = e.latlng;
-
-      // DEBUG: Log click coordinates to help fine-tune region bounds
-      // Remove this console.log once regions are verified
-      console.log(`[DEBUG] Map click: lat=${lat.toFixed(4)}, lng=${lng.toFixed(4)}`);
-
       if (disabled) return;
-
-      // Check which region was clicked
-      for (const [regionId, bounds] of Object.entries(regionBounds)) {
-        const [[minLat, minLng], [maxLat, maxLng]] = bounds;
-        if (lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng) {
-          console.log(`[DEBUG] Matched region: ${regionId}`);
-          // Check if already guessed
-          if (!guessHistory.some(g => g.regionId === regionId)) {
-            onRegionClick(regionId);
-          }
-          return;
-        }
-      }
-      console.log('[DEBUG] No region matched at this location');
+      const { lat, lng } = e.latlng;
+      onPinPlace({ lat, lng });
     }
   });
   return null;
 }
 
 function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
-  const [hoveredRegion, setHoveredRegion] = useState(null);
+  const [pinPosition, setPinPosition] = useState(null);
+  const [resolvedRegion, setResolvedRegion] = useState(null);
   const [expandedCategory, setExpandedCategory] = useState(null);
   const specialCategories = getSpecialLocationsByCategory();
 
@@ -98,6 +122,29 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
     const guess = guessHistory.find(g => g.regionId === regionId);
     if (!guess) return null;
     return guess.temperature;
+  };
+
+  const handlePinPlace = (latlng) => {
+    setPinPosition(latlng);
+    const regionId = resolveLatLngToRegion(latlng.lat, latlng.lng);
+    setResolvedRegion(regionId);
+  };
+
+  const handleConfirmGuess = () => {
+    if (!resolvedRegion) return;
+    if (guessHistory.some(g => g.regionId === resolvedRegion)) {
+      setPinPosition(null);
+      setResolvedRegion(null);
+      return;
+    }
+    onRegionSelect(resolvedRegion, { lat: pinPosition.lat, lng: pinPosition.lng });
+    setPinPosition(null);
+    setResolvedRegion(null);
+  };
+
+  const handleClearPin = () => {
+    setPinPosition(null);
+    setResolvedRegion(null);
   };
 
   const handleRegionClick = (regionId) => {
@@ -117,39 +164,6 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
   };
 
   const highlightedCategory = getLastGuessCategoryMatch();
-
-  // Get rectangle style based on status
-  const getRegionStyle = (regionId) => {
-    const status = getRegionStatus(regionId);
-    const isHovered = hoveredRegion === regionId;
-
-    const baseStyle = {
-      weight: 2,
-      fillOpacity: 0.15,
-      opacity: 0.5
-    };
-
-    if (status === TEMPERATURE.CORRECT) {
-      return { ...baseStyle, color: '#4caf50', fillColor: '#4caf50', fillOpacity: 0.5, weight: 3 };
-    }
-    if (status === TEMPERATURE.HOT) {
-      return { ...baseStyle, color: '#ff5722', fillColor: '#ff5722', fillOpacity: 0.4 };
-    }
-    if (status === TEMPERATURE.WARM) {
-      return { ...baseStyle, color: '#ff9800', fillColor: '#ff9800', fillOpacity: 0.4 };
-    }
-    if (status === TEMPERATURE.COLD) {
-      return { ...baseStyle, color: '#2196f3', fillColor: '#2196f3', fillOpacity: 0.4 };
-    }
-    if (status === TEMPERATURE.FROZEN) {
-      return { ...baseStyle, color: '#9c27b0', fillColor: '#9c27b0', fillOpacity: 0.4 };
-    }
-    if (isHovered) {
-      return { ...baseStyle, color: '#4caf50', fillColor: '#4caf50', fillOpacity: 0.25 };
-    }
-    // Default: nearly invisible until hovered
-    return { ...baseStyle, color: 'transparent', fillColor: 'transparent', fillOpacity: 0 };
-  };
 
   // Overworld-only OSRS map tiles
   const tileUrl = 'https://raw.githubusercontent.com/davsan56/OSRSGuesser/main/public/osrsmap/{z}/{x}/{y}.png';
@@ -186,41 +200,80 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
             />
 
             <MapClickHandler
-              onRegionClick={handleRegionClick}
+              onPinPlace={handlePinPlace}
               disabled={disabled}
-              guessHistory={guessHistory}
             />
 
-            {/* Render clickable region rectangles */}
-            {Object.entries(regionBounds).map(([regionId, bounds]) => {
-              const region = mapRegions[regionId];
-              if (!region) return null;
+            {/* Active pin (user's current placement, before confirm) */}
+            {pinPosition && (
+              <Marker
+                position={[pinPosition.lat, pinPosition.lng]}
+                icon={createPinIcon('#e53935')}
+              >
+                <Popup closeButton={false} autoClose={false} closeOnClick={false}>
+                  <span className="region-popup">
+                    {resolvedRegion
+                      ? (mapRegions[resolvedRegion]?.name || resolvedRegion)
+                      : 'Unknown area'}
+                  </span>
+                </Popup>
+              </Marker>
+            )}
 
-              const status = getRegionStatus(regionId);
-              const isGuessed = status !== null;
-
+            {/* Previous guess pins (colored by temperature) */}
+            {guessHistory.map((guess, idx) => {
+              if (!guess.pinLatLng) return null;
               return (
-                <Rectangle
-                  key={regionId}
-                  bounds={bounds}
-                  pathOptions={getRegionStyle(regionId)}
-                  eventHandlers={{
-                    click: () => !disabled && !isGuessed && handleRegionClick(regionId),
-                    mouseover: () => setHoveredRegion(regionId),
-                    mouseout: () => setHoveredRegion(null)
+                <CircleMarker
+                  key={idx}
+                  center={[guess.pinLatLng.lat, guess.pinLatLng.lng]}
+                  radius={6}
+                  pathOptions={{
+                    color: getTemperatureColor(guess.temperature),
+                    fillColor: getTemperatureColor(guess.temperature),
+                    fillOpacity: 0.8,
+                    weight: 2
                   }}
                 >
-                  {(hoveredRegion === regionId || isGuessed) && (
-                    <Popup closeButton={false} autoClose={false}>
-                      <span className="region-popup">{region.name}</span>
-                    </Popup>
-                  )}
-                </Rectangle>
+                  <Popup closeButton={false}>
+                    <span className="region-popup">
+                      {guess.regionName} - {guess.message}
+                    </span>
+                  </Popup>
+                </CircleMarker>
               );
             })}
           </MapContainer>
         </div>
       </div>
+
+      {/* Confirm button area - shown when pin is placed */}
+      {pinPosition && !disabled && (
+        <div className="pin-confirm-bar">
+          <div className="pin-confirm-info">
+            <span className="pin-region-label">
+              {resolvedRegion
+                ? mapRegions[resolvedRegion]?.name || resolvedRegion
+                : 'Unknown area'}
+            </span>
+            {resolvedRegion && guessHistory.some(g => g.regionId === resolvedRegion) && (
+              <span className="already-guessed-warning">Already guessed!</span>
+            )}
+          </div>
+          <div className="pin-confirm-buttons">
+            <button
+              className="confirm-guess-btn"
+              onClick={handleConfirmGuess}
+              disabled={!resolvedRegion || guessHistory.some(g => g.regionId === resolvedRegion)}
+            >
+              Confirm Guess
+            </button>
+            <button className="clear-pin-btn" onClick={handleClearPin}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Special Locations Side Panel */}
       <div className="special-locations-panel">
