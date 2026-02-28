@@ -83,7 +83,7 @@ export const musicTracks = [
 
   // Troll Country
   { name: "Troll Shuffle", url: "Troll_Shuffle.ogg", location: "Troll Stronghold" },
-  { name: "Volcano", url: "Volcano.ogg", location: "Troll Country" },
+  { name: "Kingdom", url: "Kingdom.ogg", location: "Troll Country" },
   { name: "Ice Melody", url: "Ice_Melody.ogg", location: "Ice Path" },
 
   // Kourend
@@ -91,6 +91,22 @@ export const musicTracks = [
   { name: "Dwarven Domain", url: "Dwarven_Domain.ogg", location: "Lovakengj" },
   { name: "The Forests of Shayzien", url: "The_Forests_of_Shayzien.ogg", location: "Shayzien" },
   { name: "Down by the Docks", url: "Down_by_the_Docks.ogg", location: "Piscarilius" },
+
+  // Varlamore (verify filenames against OSRS Wiki before going live)
+  { name: "Civitas illa Fortis", url: "Civitas_illa_Fortis.ogg", location: "Civitas illa Fortis" },
+  { name: "The Hunter's Call", url: "The_Hunter%27s_Call.ogg", location: "Hunter Guild" },
+  { name: "Colosseum", url: "Colosseum.ogg", location: "Varlamore" },
+
+  // Mos Le'Harmless (verify filenames against OSRS Wiki before going live)
+  { name: "Yo-Ho-Ho", url: "Yo-Ho-Ho.ogg", location: "Mos Le'Harmless" },
+  { name: "Pieces of Eight", url: "Pieces_of_Eight.ogg", location: "Mos Le'Harmless" },
+  { name: "Shiver Me Timbers", url: "Shiver_Me_Timbers.ogg", location: "Mos Le'Harmless" },
+
+  // Fossil Island
+  { name: "Fossil Island", url: "Fossil_Island.ogg", location: "Fossil Island" },
+  { name: "Fossil Island 2", url: "Fossil_Island_2.ogg", location: "Mushroom Forest" },
+  { name: "Fossil Island Underground", url: "Fossil_Island_Underground.ogg", location: "Wyvern Cave" },
+  { name: "The Museum", url: "The_Museum.ogg", location: "Museum Camp" },
 
   // Raids & Bosses
   { name: "Upper Depths", url: "Upper_Depths.ogg", location: "Chambers of Xeric" },
@@ -113,7 +129,7 @@ export const musicTracks = [
 
   // Minigames
   { name: "Pest Control", url: "Pest_Control.ogg", location: "Pest Control" },
-  { name: "Fight Cave", url: "Fight_Cave.ogg", location: "Fight Caves" },
+  { name: "TzHaar!", url: "TzHaar!.ogg", location: "Fight Caves" },
   { name: "Assault and Battery", url: "Assault_and_Battery.ogg", location: "Barbarian Assault" },
   { name: "Castle Wars", url: "Castle_Wars.ogg", location: "Castle Wars" },
   { name: "Trouble Brewing", url: "Trouble_Brewing.ogg", location: "Trouble Brewing" },

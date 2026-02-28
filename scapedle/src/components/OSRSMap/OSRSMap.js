@@ -5,8 +5,10 @@ import 'leaflet/dist/leaflet.css';
 import {
   mapRegions,
   getSpecialLocationsByCategory,
+  getRegionById,
   getTemperatureColor,
   getCategoryDisplayName,
+  regionAliases,
   TEMPERATURE,
   REGION_CATEGORIES
 } from '../../data/mapRegions';
@@ -64,9 +66,20 @@ const regionBounds = {
   ape_atoll: [[-73, 82], [-66, 94]],
   karamja: [[-64, 80], [-48, 96]],
 
+  // New small islands / specific regions (before large regions for click priority)
+  fossil_island: [[-20, 120], [-10, 132]],
+  mos_le_harmless: [[-64, 118], [-56, 130]],
+  giant_conch: [[-72, 122], [-65, 130]],
+  // Isle of Souls (west of main continent; resolves to soul_wars via alias)
+  isle_of_souls: [[-40, 48], [-30, 58]],
+  // Void Knights' Outpost south of Port Sarim (resolves to pest_control via alias)
+  void_knights_outpost: [[-60, 90], [-54, 100]],
+
   // Large regions last (lowest click priority)
   morytania: [[-50, 114], [-30, 135]],
   desert: [[-75, 100], [-50, 120]],
+  // Varlamore south of Kourend (large region, listed last)
+  varlamore: [[-52, 12], [-36, 48]],
   wilderness: [[-32, 90], [-8, 118]]
 };
 
@@ -126,7 +139,12 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
 
   const handlePinPlace = (latlng) => {
     setPinPosition(latlng);
-    const regionId = resolveLatLngToRegion(latlng.lat, latlng.lng);
+    let regionId = resolveLatLngToRegion(latlng.lat, latlng.lng);
+    // If this map region is an alias for a special location (e.g. Isle of Souls → soul_wars),
+    // resolve to the canonical ID so map clicks and side-panel clicks are treated identically.
+    if (regionAliases[regionId]) {
+      regionId = regionAliases[regionId];
+    }
     setResolvedRegion(regionId);
   };
 
@@ -165,7 +183,8 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
 
   const highlightedCategory = getLastGuessCategoryMatch();
 
-  // Overworld-only OSRS map tiles
+  // Overworld-only OSRS map tiles (OSRSGuesser tileset, calibrated to regionBounds below)
+  // TODO: switch to an updated tileset that includes Varlamore once one is verified
   const tileUrl = 'https://raw.githubusercontent.com/davsan56/OSRSGuesser/main/public/osrsmap/{z}/{x}/{y}.png';
 
   // Map bounds (prevents panning too far)
@@ -213,7 +232,7 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
                 <Popup closeButton={false} autoClose={false} closeOnClick={false}>
                   <span className="region-popup">
                     {resolvedRegion
-                      ? (mapRegions[resolvedRegion]?.name || resolvedRegion)
+                      ? (getRegionById(resolvedRegion)?.name || resolvedRegion)
                       : 'Unknown area'}
                   </span>
                 </Popup>
@@ -253,7 +272,7 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
           <div className="pin-confirm-info">
             <span className="pin-region-label">
               {resolvedRegion
-                ? mapRegions[resolvedRegion]?.name || resolvedRegion
+                ? getRegionById(resolvedRegion)?.name || resolvedRegion
                 : 'Unknown area'}
             </span>
             {resolvedRegion && guessHistory.some(g => g.regionId === resolvedRegion) && (

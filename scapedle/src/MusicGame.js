@@ -16,6 +16,7 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
   const [unlimitedSongWon, setUnlimitedSongWon] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioProgress, setAudioProgress] = useState(0);
+  const [audioError, setAudioError] = useState(false);
   const audioRef = useRef(null);
 
   // Load saved daily guess history from localStorage
@@ -103,17 +104,26 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
         setIsPlaying(false);
         setAudioProgress(0);
       });
+      audioRef.current.addEventListener('error', () => {
+        setIsPlaying(false);
+        setAudioError(true);
+      });
     }
 
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
+      setAudioError(false);
       const audioUrl = WIKI_AUDIO_BASE_URL + currentSong.url;
       if (audioRef.current.src !== audioUrl) {
         audioRef.current.src = audioUrl;
       }
-      audioRef.current.play().catch(err => console.error('Audio play error:', err));
+      audioRef.current.play().catch(err => {
+        console.error('Audio play error:', err);
+        setAudioError(true);
+        setIsPlaying(false);
+      });
       setIsPlaying(true);
     }
   };
@@ -134,6 +144,7 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
     setUnlimitedSongWon(false);
     setIsPlaying(false);
     setAudioProgress(0);
+    setAudioError(false);
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -176,6 +187,16 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
           ↺
         </button>
       </div>
+
+      {audioError && (
+        <div className="audio-error-message">
+          Failed to load audio. {musicMode === 'unlimited' && (
+            <button className="play-again-btn" onClick={handleSongPlayAgain} style={{ marginLeft: 8, padding: '4px 12px', fontSize: 13 }}>
+              Skip Song
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="music-game-instructions">
         <p>Listen to the music, place a pin on the map, and confirm your guess!</p>

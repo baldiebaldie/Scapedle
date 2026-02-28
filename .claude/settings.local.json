@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(curl:*)",
-      "WebFetch(domain:oldschool.runescape.wiki)"
+      "WebFetch(domain:oldschool.runescape.wiki)",
+      "Bash(cd:*)",
+      "Bash(npm ls:*)"
     ]
   }
 }

@@ -3,53 +3,19 @@ import './App.css';
 import { supabase } from './supabase';
 import { musicTracks } from './musicTracks';
 import MusicGame from './MusicGame';
-
-// Seeded random number generator using date string
-const seededRandom = (seed) => {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = ((hash << 5) - hash) + seed.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-};
-
-const getTodayString = () => {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-};
-
-const getYesterdayString = () => {
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-};
+import { seededRandom, getTodayString, getYesterdayString, getIndicator, getYear, hasMatchingWord } from './utils';
 
 const fetchDailyWord = async (dateString) => {
   const { data, error } = await supabase
     .from('daily_words')
     .select('item_id, item_name')
     .eq('date', dateString)
-    .single();
+    .maybeSingle();
 
-  if (error && error.code !== 'PGRST116') {
+  if (error) {
     console.error('Error fetching daily word:', error);
   }
   return data;
-};
-
-const saveDailyWord = async (dateString, item) => {
-  const { error } = await supabase
-    .from('daily_words')
-    .upsert({
-      date: dateString,
-      item_id: item.id,
-      item_name: item.name
-    }, { onConflict: 'date' });
-
-  if (error) {
-    console.error('Error saving daily word:', error);
-  }
 };
 
 const fetchDailySong = async (dateString) => {
@@ -57,9 +23,9 @@ const fetchDailySong = async (dateString) => {
     .from('daily_songs')
     .select('song_name, song_url, location')
     .eq('date', dateString)
-    .single();
+    .maybeSingle();
 
-  if (error && error.code !== 'PGRST116') {
+  if (error) {
     console.error('Error fetching daily song:', error);
   }
   return data;
@@ -120,10 +86,11 @@ function App() {
     const randomClass = backgroundClasses[Math.floor(Math.random() * backgroundClasses.length)];
     document.querySelector('.App-header').classList.add(randomClass);
 
+    const wikiHeaders = { headers: { 'User-Agent': 'Scapedle' } };
     Promise.all([
       fetch('https://raw.githubusercontent.com/0xNeffarion/osrsreboxed-db/master/docs/items-complete.json').then(r => r.json()),
-      fetch('https://prices.runescape.wiki/api/v1/osrs/latest').then(r => r.json()),
-      fetch('https://prices.runescape.wiki/api/v1/osrs/volumes').then(r => r.json())
+      fetch('https://prices.runescape.wiki/api/v1/osrs/latest', wikiHeaders).then(r => r.json()),
+      fetch('https://prices.runescape.wiki/api/v1/osrs/volumes', wikiHeaders).then(r => r.json())
     ])
       .then(([itemData, priceData, volumeData]) => {
         const prices = priceData.data;
@@ -163,17 +130,7 @@ function App() {
         setAllItems(tradeable);
 
         const today = getTodayString();
-
-        // Generate daily targets locally using seeded random (instant, no network)
-        const dailyIndex = seededRandom(today) % tradeable.length;
-        const localDailyItem = tradeable[dailyIndex];
-        setDailyTarget(localDailyItem);
-        console.log('Daily Answer:', localDailyItem.name);
-
-        // Generate yesterday's item locally
         const yesterday = getYesterdayString();
-        const yesterdayIndex = seededRandom(yesterday) % tradeable.length;
-        setYesterdayItem(tradeable[yesterdayIndex]);
 
         // Set unlimited target randomly
         const unlimitedIndex = Math.floor(Math.random() * tradeable.length);
@@ -220,19 +177,12 @@ function App() {
           localStorage.setItem('scapedle-daily-song-won', 'false');
         }
 
-        setLoading(false);
-
-        // Sync with Supabase in the background (non-blocking)
-        // This ensures the DB stays updated without blocking the UI
         (async () => {
           try {
             const todayData = await fetchDailyWord(today);
-            if (!todayData) {
-              await saveDailyWord(today, localDailyItem);
-            } else {
-              // If Supabase has a different item, use it as the canonical daily
+            if (todayData) {
               const supabaseItem = tradeable.find(item => item.id === todayData.item_id);
-              if (supabaseItem && supabaseItem.id !== localDailyItem.id) {
+              if (supabaseItem) {
                 setDailyTarget(supabaseItem);
                 console.log('Daily Answer (from Supabase):', supabaseItem.name);
               }
@@ -259,9 +209,13 @@ function App() {
             if (yesterdaySongData) {
               const song = musicTracks.find(s => s.name === yesterdaySongData.song_name);
               if (song) setYesterdaySong(song);
+            } else {
+              await saveDailySong(yesterday, musicTracks[yesterdaySongIndex]);
             }
           } catch (err) {
-            console.warn('Supabase sync failed (app still works):', err);
+            console.warn('Supabase sync failed:', err);
+          } finally {
+            setLoading(false);
           }
         })();
       })
@@ -313,23 +267,6 @@ function App() {
     setUnlimitedGuesses([]);
     setUnlimitedWon(false);
     console.log('New Unlimited Answer:', allItems[randomIndex].name);
-  };
-
-  const getIndicator = (guessVal, targetVal) => {
-    if (guessVal === targetVal) return { match: true };
-    if (guessVal < targetVal) return { match: false, arrow: '↑' };
-    return { match: false, arrow: '↓' };
-  };
-
-  const getYear = (dateStr) => {
-    if (!dateStr) return 0;
-    return new Date(dateStr).getFullYear();
-  };
-
-  const hasMatchingWord = (guessName, targetName) => {
-    const guessWords = guessName.toLowerCase().split(/\s+/);
-    const targetWords = targetName.toLowerCase().split(/\s+/);
-    return guessWords.some(word => targetWords.includes(word));
   };
 
   const renderGuessRow = (guess) => {

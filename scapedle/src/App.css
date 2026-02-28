@@ -561,6 +561,17 @@
   transform: scale(1.05);
 }
 
+.audio-error-message {
+  color: #ff5722;
+  font-size: 13px;
+  padding: 8px 16px;
+  background: rgba(255, 87, 34, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 87, 34, 0.3);
+  display: flex;
+  align-items: center;
+}
+
 /* Song guesses */
 .song-guesses {
   margin-top: 20px;

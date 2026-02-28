@@ -73,7 +73,7 @@ export const mapRegions = {
     name: "Port Sarim",
     category: REGION_CATEGORIES.OVERWORLD,
     bounds: { x: 17, y: 59, width: 6, height: 7 },
-    nearbyRegions: ["draynor", "falador", "karamja", "tutorial_island"]
+    nearbyRegions: ["draynor", "falador", "karamja", "tutorial_island", "void_knights_outpost"]
   },
 
   // Karamja
@@ -82,7 +82,7 @@ export const mapRegions = {
     name: "Karamja",
     category: REGION_CATEGORIES.OVERWORLD,
     bounds: { x: 14, y: 68, width: 12, height: 15 },
-    nearbyRegions: ["port_sarim", "ape_atoll"]
+    nearbyRegions: ["port_sarim", "ape_atoll", "mos_le_harmless"]
   },
 
   // Al Kharid
@@ -145,7 +145,7 @@ export const mapRegions = {
     name: "Morytania",
     category: REGION_CATEGORIES.OVERWORLD,
     bounds: { x: 40, y: 42, width: 16, height: 22 },
-    nearbyRegions: ["varrock"]
+    nearbyRegions: ["varrock", "fossil_island", "mos_le_harmless"]
   },
 
   // Fremennik
@@ -154,7 +154,7 @@ export const mapRegions = {
     name: "Fremennik Province",
     category: REGION_CATEGORIES.OVERWORLD,
     bounds: { x: 8, y: 22, width: 12, height: 16 },
-    nearbyRegions: ["camelot", "wilderness", "troll_country"]
+    nearbyRegions: ["camelot", "wilderness", "troll_country", "fossil_island"]
   },
 
   // Tirannwn (Elven lands)
@@ -190,7 +190,7 @@ export const mapRegions = {
     name: "Hosidius",
     category: REGION_CATEGORIES.OVERWORLD,
     bounds: { x: 60, y: 48, width: 8, height: 10 },
-    nearbyRegions: ["shayzien", "piscarilius", "arceuus", "lovakengj"]
+    nearbyRegions: ["shayzien", "piscarilius", "arceuus", "lovakengj", "varlamore"]
   },
 
   // Kourend - Arceuus
@@ -217,7 +217,7 @@ export const mapRegions = {
     name: "Shayzien",
     category: REGION_CATEGORIES.OVERWORLD,
     bounds: { x: 52, y: 44, width: 8, height: 10 },
-    nearbyRegions: ["hosidius", "lovakengj"]
+    nearbyRegions: ["hosidius", "lovakengj", "varlamore"]
   },
 
   // Kourend - Piscarilius
@@ -236,6 +236,62 @@ export const mapRegions = {
     category: REGION_CATEGORIES.OVERWORLD,
     bounds: { x: 18, y: 8, width: 6, height: 6 },
     nearbyRegions: ["troll_country", "fremennik"]
+  },
+
+  // Varlamore (south of Kourend, added 2024)
+  varlamore: {
+    id: "varlamore",
+    name: "Varlamore",
+    category: REGION_CATEGORIES.OVERWORLD,
+    bounds: { x: 50, y: 58, width: 18, height: 16 },
+    nearbyRegions: ["hosidius", "shayzien"]
+  },
+
+  // Mos Le'Harmless (island east of Karamja)
+  mos_le_harmless: {
+    id: "mos_le_harmless",
+    name: "Mos Le'Harmless",
+    category: REGION_CATEGORIES.OVERWORLD,
+    bounds: { x: 40, y: 75, width: 8, height: 8 },
+    nearbyRegions: ["karamja", "morytania"]
+  },
+
+  // Giant Conch (standalone island near Mos Le'Harmless)
+  giant_conch: {
+    id: "giant_conch",
+    name: "Giant Conch",
+    category: REGION_CATEGORIES.OVERWORLD,
+    bounds: { x: 48, y: 78, width: 5, height: 5 },
+    nearbyRegions: ["mos_le_harmless"]
+  },
+
+  // Fossil Island (northeast, accessed via Digsite)
+  fossil_island: {
+    id: "fossil_island",
+    name: "Fossil Island",
+    category: REGION_CATEGORIES.OVERWORLD,
+    bounds: { x: 42, y: 18, width: 10, height: 10 },
+    nearbyRegions: ["morytania", "fremennik"]
+  },
+
+  // Isle of Souls - map-clickable overworld region for Soul Wars
+  // Guesses here resolve to soul_wars via regionAliases
+  isle_of_souls: {
+    id: "isle_of_souls",
+    name: "Isle of Souls",
+    category: REGION_CATEGORIES.OVERWORLD,
+    bounds: { x: 2, y: 38, width: 6, height: 8 },
+    nearbyRegions: ["falador", "camelot"]
+  },
+
+  // Void Knights' Outpost - map-clickable overworld region for Pest Control
+  // Guesses here resolve to pest_control via regionAliases
+  void_knights_outpost: {
+    id: "void_knights_outpost",
+    name: "Void Knights' Outpost",
+    category: REGION_CATEGORIES.OVERWORLD,
+    bounds: { x: 12, y: 75, width: 6, height: 6 },
+    nearbyRegions: ["port_sarim", "karamja"]
   }
 };
 
@@ -376,6 +432,15 @@ export const specialLocations = {
   },
 };
 
+// Maps overworld map region IDs to their equivalent special location IDs.
+// When a player clicks these areas on the map, the guess is treated as
+// the aliased special location so that map clicks and side-panel clicks
+// are treated as the same guess (consistent temperature, deduplication, etc.).
+export const regionAliases = {
+  isle_of_souls: "soul_wars",
+  void_knights_outpost: "pest_control"
+};
+
 // Mapping from music track locations to region IDs
 export const locationToRegion = {
   // Tutorial Island & Lumbridge area
@@ -439,6 +504,27 @@ export const locationToRegion = {
 
   // Ape Atoll
   "Ape Atoll": "ape_atoll",
+
+  // Varlamore
+  "Varlamore": "varlamore",
+  "Civitas illa Fortis": "varlamore",
+  "Hunter Guild": "varlamore",
+  "Outer Fortis": "varlamore",
+
+  // Mos Le'Harmless
+  "Mos Le'Harmless": "mos_le_harmless",
+  "Mos Le'Harmless Caves": "mos_le_harmless",
+  "Harmony Island": "mos_le_harmless",
+
+  // Giant Conch
+  "Giant Conch": "giant_conch",
+
+  // Fossil Island
+  "Fossil Island": "fossil_island",
+  "Mushroom Forest": "fossil_island",
+  "Volcanic Mine": "fossil_island",
+  "Wyvern Cave": "fossil_island",
+  "Museum Camp": "fossil_island",
 
   // Kourend
   "Hosidius": "hosidius",
