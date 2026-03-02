@@ -135,7 +135,6 @@ function App() {
         // Set unlimited target randomly
         const unlimitedIndex = Math.floor(Math.random() * tradeable.length);
         setUnlimitedTarget(tradeable[unlimitedIndex]);
-        console.log('Unlimited Answer:', tradeable[unlimitedIndex].name);
 
         // Load daily progress from localStorage
         const savedDate = localStorage.getItem('scapedle-daily-date');
@@ -157,7 +156,6 @@ function App() {
         // Generate daily song locally using seeded random
         const songIndex = seededRandom(today + '-song') % musicTracks.length;
         setDailySong(musicTracks[songIndex]);
-        console.log('Daily Song:', musicTracks[songIndex].name);
 
         // Generate yesterday's song locally
         const yesterdaySongIndex = seededRandom(yesterday + '-song') % musicTracks.length;
@@ -166,7 +164,6 @@ function App() {
         // Set unlimited song randomly
         const unlimitedSongIndex = Math.floor(Math.random() * musicTracks.length);
         setUnlimitedSong(musicTracks[unlimitedSongIndex]);
-        console.log('Unlimited Song:', musicTracks[unlimitedSongIndex].name);
 
         // Load daily song progress from localStorage
         if (savedDate === today) {
@@ -184,7 +181,6 @@ function App() {
               const supabaseItem = tradeable.find(item => item.id === todayData.item_id);
               if (supabaseItem) {
                 setDailyTarget(supabaseItem);
-                console.log('Daily Answer (from Supabase):', supabaseItem.name);
               }
             }
 
@@ -201,7 +197,6 @@ function App() {
               const song = musicTracks.find(s => s.name === todaySongData.song_name);
               if (song) {
                 setDailySong(song);
-                console.log('Daily Song (from Supabase):', song.name);
               }
             }
 
@@ -266,7 +261,6 @@ function App() {
     setUnlimitedTarget(allItems[randomIndex]);
     setUnlimitedGuesses([]);
     setUnlimitedWon(false);
-    console.log('New Unlimited Answer:', allItems[randomIndex].name);
   };
 
   const renderGuessRow = (guess) => {

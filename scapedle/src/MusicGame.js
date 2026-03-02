@@ -175,7 +175,6 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
-    console.log('New Unlimited Song:', newSong.name);
   };
 
   return (
