@@ -412,7 +412,12 @@ function App() {
                 </div>
               )}
 
-              {gameWon ? (
+              {gameMode === 'daily' && !dailyTarget ? (
+                <div className="no-daily-message">
+                  <p>Today's item hasn't been generated yet. Check back soon!</p>
+                  <button className="play-again-btn" onClick={() => window.location.reload()}>Refresh</button>
+                </div>
+              ) : gameWon ? (
                 <div className="win-message">
                   <h2>
                     {' '}
@@ -450,7 +455,7 @@ function App() {
                 </div>
               )}
 
-              {guesses.length > 0 && (
+              {guesses.length > 0 && targetItem && (
                 <div className="guess-table">
                   <div className="guess-row header">
                     <div className="cell item-cell">Item</div>

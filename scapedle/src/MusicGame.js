@@ -8,6 +8,25 @@ import {
   TEMPERATURE
 } from './data/mapRegions';
 
+const audioUrlCache = {};
+
+async function resolveWikiAudioUrl(filename) {
+  if (audioUrlCache[filename]) return audioUrlCache[filename];
+  try {
+    const apiUrl = `https://oldschool.runescape.wiki/api.php?action=query&prop=imageinfo&iiprop=url&titles=File:${filename}&format=json&origin=*`;
+    const res = await fetch(apiUrl);
+    const data = await res.json();
+    const pages = data.query.pages;
+    const page = Object.values(pages)[0];
+    const url = page?.imageinfo?.[0]?.url;
+    if (url) audioUrlCache[filename] = url;
+    return url || null;
+  } catch (err) {
+    console.warn('Failed to resolve wiki audio URL:', err);
+    return null;
+  }
+}
+
 function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, initialDailyWon }) {
   const [musicMode, setMusicMode] = useState('daily');
   const [dailyGuessHistory, setDailyGuessHistory] = useState([]);
@@ -17,6 +36,7 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioProgress, setAudioProgress] = useState(0);
   const [audioError, setAudioError] = useState(false);
+  const [audioLoading, setAudioLoading] = useState(false);
   const audioRef = useRef(null);
 
   // Load saved daily guess history from localStorage
@@ -89,7 +109,7 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
     }
   };
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (!currentSong) return;
 
     if (!audioRef.current) {
@@ -106,6 +126,7 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
       });
       audioRef.current.addEventListener('error', () => {
         setIsPlaying(false);
+        setAudioLoading(false);
         setAudioError(true);
       });
     }
@@ -115,13 +136,18 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
       setIsPlaying(false);
     } else {
       setAudioError(false);
-      const audioUrl = WIKI_AUDIO_BASE_URL + currentSong.url;
+      const resolvedUrl = await resolveWikiAudioUrl(currentSong.url);
+      const audioUrl = resolvedUrl || (WIKI_AUDIO_BASE_URL + currentSong.url);
       if (audioRef.current.src !== audioUrl) {
+        setAudioLoading(true);
         audioRef.current.src = audioUrl;
       }
-      audioRef.current.play().catch(err => {
+      audioRef.current.play().then(() => {
+        setAudioLoading(false);
+      }).catch(err => {
         console.error('Audio play error:', err);
         setAudioError(true);
+        setAudioLoading(false);
         setIsPlaying(false);
       });
       setIsPlaying(true);
@@ -177,8 +203,8 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
       )}
 
       <div className="audio-player">
-        <button className="play-btn" onClick={togglePlay}>
-          {isPlaying ? '⏸' : '▶'}
+        <button className="play-btn" onClick={togglePlay} disabled={audioLoading}>
+          {audioLoading ? '…' : isPlaying ? '⏸' : '▶'}
         </button>
         <div className="audio-progress">
           <div className="progress-bar" style={{ width: `${audioProgress}%` }} />
