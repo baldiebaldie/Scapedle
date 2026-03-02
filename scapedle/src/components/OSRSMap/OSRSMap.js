@@ -3,7 +3,6 @@ import { MapContainer, TileLayer, Marker, CircleMarker, Popup, useMapEvents } fr
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
-  mapRegions,
   getSpecialLocationsByCategory,
   getRegionById,
   getTemperatureColor,
