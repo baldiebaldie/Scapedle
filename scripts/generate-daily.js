@@ -31,6 +31,27 @@ function seededRandom(seed) {
   return Math.abs(hash);
 }
 
+// Mulberry32 PRNG — good distribution for seeded shuffle
+function mulberry32(seed) {
+  return function () {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Fisher-Yates shuffle using a seeded PRNG so the order is stable but non-sequential
+function shuffleWithSeed(arr, seedStr) {
+  const rng = mulberry32(seededRandom(seedStr));
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 function getDateString(daysFromNow) {
   const d = new Date();
   d.setDate(d.getDate() + daysFromNow);
@@ -252,10 +273,14 @@ async function main() {
   const tradeable = filterTradeable(itemData, priceData.data, volumeData.data);
   console.log(`Filtered to ${tradeable.length} tradeable items.\n`);
 
+  // Shuffle with a fixed seed so the order is randomised but stable across runs.
+  // This prevents consecutive dates from picking items with sequential wiki IDs.
+  const shuffled = shuffleWithSeed(tradeable, 'scapedle-v1');
+
   for (let dayOffset = 0; dayOffset <= 6; dayOffset++) {
     const dateStr = getDateString(dayOffset);
-    const itemIndex = seededRandom(dateStr) % tradeable.length;
-    const item = tradeable[itemIndex];
+    const itemIndex = seededRandom(dateStr) % shuffled.length;
+    const item = shuffled[itemIndex];
     const songIndex = seededRandom(dateStr + '-song') % MUSIC_TRACKS.length;
     const song = MUSIC_TRACKS[songIndex];
 
