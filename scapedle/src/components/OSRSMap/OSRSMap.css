@@ -314,23 +314,72 @@
 @media (max-width: 768px) {
   .osrs-map-section {
     flex-direction: column;
+    gap: 12px;
   }
 
   .osrs-map-container {
-    height: 400px;
+    height: 360px;
+    border-radius: 10px;
   }
 
   .pin-confirm-bar {
     flex-direction: column;
     gap: 12px;
     text-align: center;
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  /* Stack confirm buttons full-width */
+  .pin-confirm-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .confirm-guess-btn,
+  .clear-pin-btn {
+    flex: 1;
+    min-height: 44px;
+    font-size: 14px;
   }
 
   .temperature-legend {
-    gap: 12px;
+    gap: 10px;
+    padding: 10px;
   }
 
   .legend-item {
+    font-size: 11px;
+  }
+
+  /* Special locations panel — more compact */
+  .special-locations-panel {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .category-header {
+    padding: 10px 12px;
+    min-height: 44px;
+  }
+
+  .special-location-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+    min-height: 36px;
+  }
+
+  /* Guess history */
+  .guess-history {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .guess-region {
+    font-size: 12px;
+  }
+
+  .guess-temp {
     font-size: 11px;
   }
 }

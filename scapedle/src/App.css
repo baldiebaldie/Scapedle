@@ -151,7 +151,7 @@
   max-height: 240px;
   overflow-y: auto;
   border-radius: 0 0 8px 8px;
-  z-index: 10;
+  z-index: 200;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   animation: fadeIn 0.2s ease-out;
 }
@@ -365,7 +365,7 @@
   align-items: center;
   justify-content: center;
   transition: all 0.25s ease;
-  z-index: 20;
+  z-index: 160;
 }
 
 .help-button:hover {
@@ -387,7 +387,7 @@
   line-height: 1.5;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 15;
+  z-index: 150;
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -623,4 +623,226 @@
   margin: 0;
   font-size: 14px;
   color: #aaa;
+}
+
+/* ==========================================
+   MOBILE — applies only on screens ≤ 768px
+   ========================================== */
+@media (max-width: 768px) {
+
+  /* ---- Page shell ---- */
+  .App-header {
+    padding-top: 16px;
+    padding-bottom: 32px;
+    /* Fix iOS Safari fixed-bg glitch */
+    background-attachment: scroll;
+  }
+
+  /* ---- Game card ---- */
+  .game-container {
+    padding: 20px 14px 24px;
+    width: calc(100% - 24px);
+    border-radius: 14px;
+    min-height: unset;
+  }
+
+  /* ---- Title ---- */
+  .game-container h1 {
+    font-size: 1.75rem;
+    letter-spacing: 1px;
+    gap: 8px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
+
+  .title-rune {
+    width: 38px;
+    height: 38px;
+  }
+
+  /* ---- Help button ---- */
+  .help-button {
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  /* ---- Help panel — keep overlay, constrain width to container ---- */
+  .help-panel {
+    left: 8px;
+    right: 8px;
+    width: auto;
+    top: 52px;
+    font-size: 12px;
+    padding: 16px;
+  }
+
+  .help-panel h3 { font-size: 15px; }
+  .help-panel h4 { font-size: 13px; }
+
+  /* ---- Game-type tabs (Items / Music) ---- */
+  .game-type-tabs {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .game-type-tab {
+    flex: 1;
+    padding: 10px 8px;
+    font-size: 14px;
+  }
+
+  /* ---- Daily / Unlimited tabs ---- */
+  .tab-container {
+    width: 100%;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 12px 8px;
+    font-size: 14px;
+  }
+
+  /* ---- Search input ---- */
+  .search-container {
+    width: 100%;
+    margin: 14px 0;
+    /* Create an elevated stacking context so suggestions always render
+       above item icons (which form sub-stacking contexts via filter) */
+    z-index: 100;
+  }
+
+  .search-container input {
+    width: 100%;
+    box-sizing: border-box;
+    /* 16px prevents iOS from auto-zooming on input focus */
+    font-size: 16px;
+    padding: 14px 16px;
+  }
+
+  .suggestions {
+    font-size: 14px;
+  }
+
+  /* Bigger tap targets for suggestions */
+  .suggestion {
+    padding: 14px 16px;
+  }
+
+  /* ---- Yesterday banner ---- */
+  .yesterday-word {
+    font-size: 12px;
+    padding: 6px 12px;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  /* ---- Guess table — horizontal scroll with iOS momentum ---- */
+  .guess-table {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 16px;
+    /* Inset shadow hints there's more content to the right */
+    border-radius: 8px;
+  }
+
+  .guess-row {
+    flex-wrap: nowrap;
+    min-width: max-content;
+    gap: 4px;
+    margin: 4px 0;
+  }
+
+  /* Compact header labels */
+  .guess-row.header .cell {
+    font-size: 10px;
+    padding: 8px 6px;
+    min-width: 68px;
+    letter-spacing: 0;
+  }
+
+  .guess-row.header .item-cell {
+    min-width: 100px;
+  }
+
+  /* Compact data cells */
+  .cell {
+    padding: 8px 6px;
+    min-width: 68px;
+    font-size: 11px;
+  }
+
+  /* Disable the lift-on-hover on touch (no hover concept) */
+  .cell:hover {
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .item-cell {
+    min-width: 100px;
+    font-size: 11px;
+    gap: 6px;
+    padding: 8px 8px;
+  }
+
+  .item-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  /* ---- Win message ---- */
+  .win-message h2 {
+    font-size: 1.35rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    line-height: 1.3;
+  }
+
+  .play-again-btn {
+    padding: 14px 28px;
+    font-size: 15px;
+    /* Ensure a comfortable touch target */
+    min-height: 48px;
+  }
+
+  /* ---- Audio player ---- */
+  .audio-player {
+    padding: 14px 16px;
+    gap: 12px;
+    max-width: 100%;
+    margin: 14px 0;
+  }
+
+  /* ---- Music instructions ---- */
+  .music-game-instructions {
+    max-width: 100%;
+    padding: 10px 14px;
+  }
+
+  /* ---- Song guess rows ---- */
+  .song-guesses {
+    max-width: 100%;
+  }
+
+  .song-guess-row {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+
+  .location-hint {
+    font-size: 11px;
+  }
+
+  /* ---- No-daily placeholder ---- */
+  .no-daily-message {
+    padding: 16px 8px;
+  }
 }

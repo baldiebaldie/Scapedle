@@ -330,22 +330,46 @@ function App() {
           </div>
           {showHelp && (
             <div className="help-panel">
-              <h3>How to Play</h3>
-              <p>Guess the random Old School RuneScape item!</p>
-              <p>Type an item name and pick from the list. After each guess, you'll see hints about the target item.</p>
-              <h4>What the colors mean:</h4>
-              <ul>
-                <li><span className="color-box green"></span> <strong>Green</strong> = Correct - This value matches exactly.</li>
-                <li><span className="color-box orange"></span> <strong>Orange</strong> = Close - You're on the right track.</li>
-                <li><span className="color-box red"></span> <strong>Red</strong> = Wrong - This value doesn't match.</li>
-              </ul>
-              <h4>Orange hints explained:</h4>
-              <ul>
-                <li><strong>Item name:</strong> Your guess shares a word with the answer (like "Rune scimitar" and "Rune platebody").</li>
-                <li><strong>Item slot:</strong> Both items are equippable, but in different slots.</li>
-              </ul>
-              <h4>Arrows:</h4>
-              <p>↑ means the target value is higher. ↓ means the target value is lower.</p>
+              {gameType === 'items' ? (
+                <>
+                  <h3>How to Play — Items</h3>
+                  <p>Guess the random Old School RuneScape item!</p>
+                  <p>Type an item name and pick from the list. After each guess, you'll see hints about the target item.</p>
+                  <h4>What the colors mean:</h4>
+                  <ul>
+                    <li><span className="color-box green"></span> <strong>Green</strong> = Correct - This value matches exactly.</li>
+                    <li><span className="color-box orange"></span> <strong>Orange</strong> = Close - You're on the right track.</li>
+                    <li><span className="color-box red"></span> <strong>Red</strong> = Wrong - This value doesn't match.</li>
+                  </ul>
+                  <h4>Orange hints explained:</h4>
+                  <ul>
+                    <li><strong>Item name:</strong> Your guess shares a word with the answer (like "Rune scimitar" and "Rune platebody").</li>
+                    <li><strong>Item slot:</strong> Both items are equippable, but in different slots.</li>
+                  </ul>
+                  <h4>Arrows:</h4>
+                  <p>↑ means the target value is higher. ↓ means the target value is lower.</p>
+                </>
+              ) : (
+                <>
+                  <h3>How to Play — Music</h3>
+                  <p>A random OSRS music track is playing. Guess where in the game it unlocks!</p>
+                  <ol style={{ paddingLeft: '18px', color: '#ccc', margin: '8px 0' }}>
+                    <li>Press ▶ to listen to the track.</li>
+                    <li>Click a region on the map, or pick one from the Special Locations panel.</li>
+                    <li>Press <strong>Confirm Guess</strong> to submit.</li>
+                  </ol>
+                  <h4>Temperature feedback:</h4>
+                  <ul>
+                    <li>🟢 <strong>Correct!</strong> — That's the exact region.</li>
+                    <li>🔴 <strong>Hot</strong> — Same area, very close region.</li>
+                    <li>🟠 <strong>Warm</strong> — Same broad area, different region.</li>
+                    <li>🔵 <strong>Cold</strong> — Different area of the game.</li>
+                    <li>❄️ <strong>Frozen</strong> — Very far off (e.g., overworld vs. a raid).</li>
+                  </ul>
+                  <h4>Special Locations:</h4>
+                  <p>Use the panel beside the map for instanced areas like raids, bosses, and minigames that don't appear on the main map.</p>
+                </>
+              )}
             </div>
           )}
           <h1>
