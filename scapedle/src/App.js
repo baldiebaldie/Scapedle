@@ -4,7 +4,7 @@ import { supabase } from './supabase';
 import { musicTracks } from './musicTracks';
 import MusicGame from './MusicGame';
 import { seededRandom, getTodayString, getYesterdayString, getIndicator, getYear, hasMatchingWord, calculateScore } from './utils';
-import ReactGA from 'react-ga4';
+const gtag = (...args) => { if (typeof window.gtag === 'function') window.gtag(...args); };
 
 const fetchDailyWord = async (dateString) => {
   const { data, error } = await supabase
@@ -200,17 +200,22 @@ function App() {
 
         (async () => {
           try {
+            const findItemById = (id) =>
+              tradeable.find(item => item.id === id) ||
+              Object.values(itemData)
+                .filter(item => item.tradeable_on_ge && item.name && !item.noted && !item.placeholder)
+                .map(item => ({ ...item, ge_price: prices[item.id]?.high ?? null, volume: volumes[item.id] ?? 0 }))
+                .find(item => item.id === id);
+
             const todayData = await fetchDailyWord(today);
             if (todayData) {
-              const supabaseItem = tradeable.find(item => item.id === todayData.item_id);
-              if (supabaseItem) {
-                setDailyTarget(supabaseItem);
-              }
+              const supabaseItem = findItemById(todayData.item_id);
+              if (supabaseItem) setDailyTarget(supabaseItem);
             }
 
             const yesterdayData = await fetchDailyWord(yesterday);
             if (yesterdayData) {
-              const yesterdayWord = tradeable.find(item => item.id === yesterdayData.item_id);
+              const yesterdayWord = findItemById(yesterdayData.item_id);
               if (yesterdayWord) setYesterdayItem(yesterdayWord);
             }
 
@@ -273,9 +278,9 @@ function App() {
         setDailyItemsScore(score);
         localStorage.setItem('scapedle-daily-won', 'true');
         localStorage.setItem('scapedle-daily-items-score', String(score));
-        ReactGA.event('game_won', { game_type: 'items', mode: 'daily', guesses: newGuesses.length, score });
+        gtag('event', 'game_won', { game_type: 'items', mode: 'daily', guesses: newGuesses.length, score });
       } else {
-        ReactGA.event('item_guess', { mode: 'daily', guess_number: newGuesses.length });
+        gtag('event', 'item_guess', { mode: 'daily', guess_number: newGuesses.length });
       }
     } else {
       const newGuesses = [...unlimitedGuesses, item];
@@ -283,9 +288,9 @@ function App() {
 
       if (item.id === unlimitedTarget.id) {
         setUnlimitedWon(true);
-        ReactGA.event('game_won', { game_type: 'items', mode: 'unlimited', guesses: newGuesses.length });
+        gtag('event', 'game_won', { game_type: 'items', mode: 'unlimited', guesses: newGuesses.length });
       } else {
-        ReactGA.event('item_guess', { mode: 'unlimited', guess_number: newGuesses.length });
+        gtag('event', 'item_guess', { mode: 'unlimited', guess_number: newGuesses.length });
       }
     }
 
@@ -422,13 +427,13 @@ function App() {
           <div className="game-type-tabs">
             <button
               className={`game-type-tab ${gameType === 'items' ? 'active' : ''}`}
-              onClick={() => { setGameType('items'); ReactGA.event('game_type_switch', { game_type: 'items' }); }}
+              onClick={() => { setGameType('items'); gtag('event', 'game_type_switch', { game_type: 'items' }); }}
             >
               Items
             </button>
             <button
               className={`game-type-tab ${gameType === 'music' ? 'active' : ''}`}
-              onClick={() => { setGameType('music'); ReactGA.event('game_type_switch', { game_type: 'music' }); }}
+              onClick={() => { setGameType('music'); gtag('event', 'game_type_switch', { game_type: 'music' }); }}
             >
               Music
             </button>
@@ -449,13 +454,13 @@ function App() {
               <div className="tab-container">
                 <button
                   className={`tab ${gameMode === 'daily' ? 'active' : ''}`}
-                  onClick={() => { setGameMode('daily'); ReactGA.event('mode_switch', { mode: 'daily' }); }}
+                  onClick={() => { setGameMode('daily'); gtag('event', 'mode_switch', { mode: 'daily' }); }}
                 >
                   Daily
                 </button>
                 <button
                   className={`tab ${gameMode === 'unlimited' ? 'active' : ''}`}
-                  onClick={() => { setGameMode('unlimited'); ReactGA.event('mode_switch', { mode: 'unlimited' }); }}
+                  onClick={() => { setGameMode('unlimited'); gtag('event', 'mode_switch', { mode: 'unlimited' }); }}
                 >
                   Unlimited
                 </button>

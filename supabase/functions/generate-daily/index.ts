@@ -10,6 +10,28 @@ function seededRandom(seed: string): number {
   return Math.abs(hash);
 }
 
+// Mulberry32 PRNG — good distribution for seeded shuffle
+function mulberry32(seed: number): () => number {
+  return function () {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Fisher-Yates shuffle using a seeded PRNG so the order is stable but non-sequential
+// deno-lint-ignore no-explicit-any
+function shuffleWithSeed(arr: any[], seedStr: string): any[] {
+  const rng = mulberry32(seededRandom(seedStr));
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 function getDateString(daysFromNow: number): string {
   const d = new Date();
   d.setDate(d.getDate() + daysFromNow);
@@ -233,22 +255,27 @@ Deno.serve(async (_req) => {
     ]);
 
     const tradeable = filterTradeable(itemData, priceData.data, volumeData.data);
+    const shuffled = shuffleWithSeed(tradeable, "scapedle-v1");
 
     // Generate entries for today + next 6 days
     const results = [];
     for (let dayOffset = 0; dayOffset <= 6; dayOffset++) {
       const dateStr = getDateString(dayOffset);
 
-      const itemIndex = seededRandom(dateStr) % tradeable.length;
-      const item = tradeable[itemIndex];
+      const itemIndex = seededRandom(dateStr) % shuffled.length;
+      const item = shuffled[itemIndex];
 
       const songIndex = seededRandom(dateStr + "-song") % MUSIC_TRACKS.length;
       const song = MUSIC_TRACKS[songIndex];
 
-      // Upsert word — onConflict skips if already exists
+      // Upsert word — overwrites existing row so NULL rows can be healed on re-run
+      if (!item || !item.id || !item.name) {
+        results.push({ date: dateStr, item: null, song: song.name, wordError: `No valid item (tradeable count: ${shuffled.length})`, songError: null });
+        continue;
+      }
       const { error: wordError } = await db.from("daily_words").upsert(
         { date: dateStr, item_id: item.id, item_name: item.name },
-        { onConflict: "date", ignoreDuplicates: true },
+        { onConflict: "date", ignoreDuplicates: false },
       );
 
       const { error: songError } = await db.from("daily_songs").upsert(

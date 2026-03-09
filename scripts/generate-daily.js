@@ -284,11 +284,15 @@ async function main() {
     const songIndex = seededRandom(dateStr + '-song') % MUSIC_TRACKS.length;
     const song = MUSIC_TRACKS[songIndex];
 
+    if (!item || !item.id || !item.name) {
+      console.log(`${dateStr}  ERROR: no valid item selected (tradeable count: ${shuffled.length})`);
+      continue;
+    }
     const { error: wordError } = await supabase
       .from('daily_words')
       .upsert(
         { date: dateStr, item_id: item.id, item_name: item.name },
-        { onConflict: 'date', ignoreDuplicates: true }
+        { onConflict: 'date', ignoreDuplicates: false }
       );
 
     const { error: songError } = await supabase
