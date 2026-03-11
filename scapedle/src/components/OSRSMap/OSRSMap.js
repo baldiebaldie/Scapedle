@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import React, { useState, useCallback } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Rectangle, Tooltip, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
@@ -46,15 +46,18 @@ const regionBounds = {
   weiss: [[-16, 87], [-10, 94]],
 
   // Kourend sub-regions (northwest of main continent)
+  // Stranglewood listed before Shayzien so it takes click priority in the overlapping area
+  // (resolves to varlamore via regionAliases)
+  stranglewood: [[-41.2, 6.2], [-35.9, 22.6]],
   lovakengj: [[-23, 14], [-15, 27]],
   arceuus: [[-23, 27], [-15, 42]],
-  shayzien: [[-33, 18], [-23, 30]],
-  hosidius: [[-35, 28], [-24, 40]],
+  shayzien: [[-35.6, 8.8], [-23, 27.4]],
+  hosidius: [[-36, 28], [-24, 42.8]],
   piscarilius: [[-25, 38], [-18, 48]],
 
   // Small mainland regions
   port_sarim: [[-50, 92], [-45, 100]],
-  draynor: [[-50, 96], [-41, 103]],
+  draynor: [[-50, 93], [-40, 103]],
   al_kharid: [[-50, 109], [-42, 116]],
   lumbridge: [[-50, 103], [-42, 109]],
 
@@ -65,32 +68,32 @@ const regionBounds = {
   // Western areas
   camelot: [[-40, 68], [-32, 90]],
   ardougne: [[-48, 68], [-40, 82]],
-  yanille: [[-57, 66], [-48, 80]],
+  // Isle of Souls — resolves to soul_wars via regionAliases
+  isle_of_souls: [[-69.2, 51.4], [-56.5, 65.5]],
+  feldip_hills: [[-66, 67.1], [-54.7, 79.4]],
+  yanille: [[-53, 66], [-47, 80]],
   tirannwn: [[-55, 50], [-34, 68]],
 
-  // Northern areas
-  troll_country: [[-32, 84], [-24, 92]],
-  fremennik: [[-30, 58], [-14, 78]],
+  // Northern areas — fremennik BEFORE troll_country so Rellekka (east fremennik) wins
+  fremennik: [[-30.2, 49.3], [-5.5, 82.8]],
+  troll_country: [[-32, 82.6], [-14.9, 89.8]],
 
   // Southern areas
+  giant_conch: [[-89.6, 97.5], [-77.6, 111.1]],
   ape_atoll: [[-73, 82], [-66, 94]],
   karamja: [[-64, 80], [-48, 96]],
 
   // New small islands / specific regions (before large regions for click priority)
-  fossil_island: [[-20, 120], [-10, 132]],
-  mos_le_harmless: [[-64, 118], [-56, 130]],
-  giant_conch: [[-72, 122], [-65, 130]],
-  // Isle of Souls (west of main continent; resolves to soul_wars via alias)
-  isle_of_souls: [[-40, 48], [-30, 58]],
+  fossil_island: [[-29.2, 120], [-10, 139.5]],
+  mos_le_harmless: [[-64, 124.2], [-53.3, 138.6]],
   // Void Knights' Outpost south of Port Sarim (resolves to pest_control via alias)
   void_knights_outpost: [[-60, 90], [-54, 100]],
 
   // Large regions last (lowest click priority)
   morytania: [[-50, 114], [-30, 135]],
   desert: [[-75, 100], [-50, 120]],
-  // Varlamore south of Kourend (large region, listed last)
-  varlamore: [[-52, 12], [-36, 48]],
-  wilderness: [[-32, 90], [-8, 118]]
+  varlamore: [[-65.5, 10.9], [-41.8, 42]],
+  wilderness: [[-32, 90], [-13.3, 118.3]],
 };
 
 // Resolve a lat/lng coordinate to the nearest region ID
@@ -122,12 +125,109 @@ function resolveLatLngToRegion(lat, lng) {
   return nearestRegion;
 }
 
+// Dev mode — detect /dev in the URL pathname
+const isDevMode = window.location.pathname.includes('/dev');
+
+// Small square handle icon for region corner resize handles
+const cornerHandleIcon = L.divIcon({
+  className: '',
+  html: '<div style="width:10px;height:10px;background:#fff;border:2px solid #111;border-radius:2px;cursor:crosshair;box-shadow:0 0 3px rgba(0,0,0,0.8);"></div>',
+  iconSize: [10, 10],
+  iconAnchor: [5, 5]
+});
+
+// Distinct colours for each region rectangle
+const DEV_COLORS = [
+  '#ff4444','#ff8c00','#ffd700','#7fff00','#00e5ff',
+  '#1e90ff','#bf00ff','#ff69b4','#00fa9a','#ff6347',
+  '#adff2f','#00bfff','#da70d6','#ffa500','#40e0d0',
+  '#ff1493','#7cfc00','#4169e1','#ff4500','#00ced1',
+  '#9400d3','#32cd32','#dc143c','#00ff7f','#8a2be2',
+  '#ff8c00','#20b2aa','#ff00ff','#6495ed','#f08080'
+];
+
+function DevRegionOverlay({ devBounds, setDevBounds }) {
+  const regionList = Object.keys(devBounds);
+
+  const updateCorner = useCallback((regionId, corner, lat, lng) => {
+    setDevBounds(prev => {
+      const [[minLat, minLng], [maxLat, maxLng]] = prev[regionId];
+      const updated = {
+        SW: [[lat, lng], [maxLat, maxLng]],
+        NW: [[minLat, lng], [lat, maxLng]],
+        NE: [[minLat, minLng], [lat, lng]],
+        SE: [[lat, minLng], [maxLat, lng]],
+      }[corner] ?? prev[regionId];
+      return { ...prev, [regionId]: updated };
+    });
+  }, [setDevBounds]);
+
+  return (
+    <>
+      {regionList.map((regionId, idx) => {
+        const bounds = devBounds[regionId];
+        const [[minLat, minLng], [maxLat, maxLng]] = bounds;
+        const color = DEV_COLORS[idx % DEV_COLORS.length];
+        const centerLat = (minLat + maxLat) / 2;
+        const centerLng = (minLng + maxLng) / 2;
+
+        return (
+          <React.Fragment key={regionId}>
+            <Rectangle
+              bounds={bounds}
+              pathOptions={{ color, fillColor: color, fillOpacity: 0.15, weight: 2 }}
+            >
+              <Tooltip permanent direction="center" className="dev-region-label" offset={[0, 0]}>
+                {regionId}
+              </Tooltip>
+            </Rectangle>
+
+            {/* SW corner */}
+            <Marker position={[minLat, minLng]} icon={cornerHandleIcon} draggable
+              eventHandlers={{ dragend: e => { const p = e.target.getLatLng(); updateCorner(regionId, 'SW', p.lat, p.lng); } }}
+            />
+            {/* NW corner */}
+            <Marker position={[maxLat, minLng]} icon={cornerHandleIcon} draggable
+              eventHandlers={{ dragend: e => { const p = e.target.getLatLng(); updateCorner(regionId, 'NW', p.lat, p.lng); } }}
+            />
+            {/* NE corner */}
+            <Marker position={[maxLat, maxLng]} icon={cornerHandleIcon} draggable
+              eventHandlers={{ dragend: e => { const p = e.target.getLatLng(); updateCorner(regionId, 'NE', p.lat, p.lng); } }}
+            />
+            {/* SE corner */}
+            <Marker position={[minLat, maxLng]} icon={cornerHandleIcon} draggable
+              eventHandlers={{ dragend: e => { const p = e.target.getLatLng(); updateCorner(regionId, 'SE', p.lat, p.lng); } }}
+            />
+            {/* Center label marker (invisible, just for click-to-log) */}
+            <Marker
+              position={[centerLat, centerLng]}
+              icon={L.divIcon({ className: '', html: '', iconSize: [0, 0] })}
+              eventHandlers={{ click: () => console.log(`[DEV] ${regionId}: [[${minLat.toFixed(1)}, ${minLng.toFixed(1)}], [${maxLat.toFixed(1)}, ${maxLng.toFixed(1)}]]`) }}
+            />
+          </React.Fragment>
+        );
+      })}
+    </>
+  );
+}
+
+// Formats devBounds as the JS literal you can paste into regionBounds
+function formatBoundsCode(devBounds) {
+  const lines = Object.entries(devBounds).map(([id, [[minLat, minLng], [maxLat, maxLng]]]) => {
+    const fmt = (n) => Number(n.toFixed(1));
+    return `  ${id}: [[${fmt(minLat)}, ${fmt(minLng)}], [${fmt(maxLat)}, ${fmt(maxLng)}]],`;
+  });
+  return `const regionBounds = {\n${lines.join('\n')}\n};`;
+}
+
 // Click handler that places a pin on the map
 function MapClickHandler({ onPinPlace, disabled }) {
   useMapEvents({
     click: (e) => {
-      if (disabled) return;
       const { lat, lng } = e.latlng;
+      // COORD DEBUG — remove when done calibrating bounds
+      console.log(`[MAP CLICK] lat: ${lat.toFixed(2)}, lng: ${lng.toFixed(2)}  →  resolves to: ${resolveLatLngToRegion(lat, lng)}`);
+      if (disabled) return;
       onPinPlace({ lat, lng });
     }
   });
@@ -139,6 +239,28 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
   const [resolvedRegion, setResolvedRegion] = useState(null);
   const [expandedCategory, setExpandedCategory] = useState(null);
   const specialCategories = getSpecialLocationsByCategory();
+
+  // Dev mode — editable copy of regionBounds for live visual calibration
+  const [devBounds, setDevBounds] = useState(() =>
+    Object.fromEntries(
+      Object.entries(regionBounds).map(([id, b]) => [id, b.map(pt => [...pt])])
+    )
+  );
+  const [devCopied, setDevCopied] = useState(false);
+
+  const handleDevCopy = () => {
+    navigator.clipboard.writeText(formatBoundsCode(devBounds));
+    setDevCopied(true);
+    setTimeout(() => setDevCopied(false), 2000);
+  };
+
+  const handleDevReset = () => {
+    setDevBounds(
+      Object.fromEntries(
+        Object.entries(regionBounds).map(([id, b]) => [id, b.map(pt => [...pt])])
+      )
+    );
+  };
 
   // Get the temperature status for a region based on guess history
   const getRegionStatus = (regionId) => {
@@ -225,6 +347,11 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
               disabled={disabled}
             />
 
+            {/* Dev mode region overlays */}
+            {isDevMode && (
+              <DevRegionOverlay devBounds={devBounds} setDevBounds={setDevBounds} />
+            )}
+
             {/* Active pin (user's current placement, before confirm) */}
             {pinPosition && (
               <Marker
@@ -262,6 +389,25 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
           </MapContainer>
         </div>
       </div>
+
+      {/* Dev mode bounds panel */}
+      {isDevMode && (
+        <div className="dev-bounds-panel">
+          <div className="dev-bounds-header">
+            <span className="dev-badge">DEV MODE</span>
+            <span className="dev-hint">Drag corner handles to resize regions. Copy when done.</span>
+            <div className="dev-bounds-actions">
+              <button className="dev-btn dev-btn-copy" onClick={handleDevCopy}>
+                {devCopied ? 'Copied!' : 'Copy Bounds'}
+              </button>
+              <button className="dev-btn dev-btn-reset" onClick={handleDevReset}>
+                Reset
+              </button>
+            </div>
+          </div>
+          <pre className="dev-bounds-code">{formatBoundsCode(devBounds)}</pre>
+        </div>
+      )}
 
       {/* Confirm button area - shown when pin is placed */}
       {pinPosition && !disabled && (

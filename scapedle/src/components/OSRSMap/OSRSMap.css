@@ -310,6 +310,100 @@
   border-radius: 4px;
 }
 
+/* ── Dev Mode ─────────────────────────────────────── */
+.dev-bounds-panel {
+  background: #0d1117;
+  border: 2px solid #f0a500;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dev-bounds-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dev-badge {
+  background: #f0a500;
+  color: #000;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.dev-hint {
+  color: #aaa;
+  font-size: 12px;
+  flex: 1;
+}
+
+.dev-bounds-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.dev-btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+
+.dev-btn:hover { opacity: 0.85; }
+
+.dev-btn-copy {
+  background: #f0a500;
+  color: #000;
+}
+
+.dev-btn-reset {
+  background: #2a2d33;
+  color: #ccc;
+  border: 1px solid #444;
+}
+
+.dev-bounds-code {
+  background: #161b22;
+  color: #7ee787;
+  font-size: 11px;
+  line-height: 1.5;
+  padding: 10px 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  max-height: 220px;
+  overflow-y: auto;
+  margin: 0;
+  border: 1px solid #30363d;
+}
+
+/* Permanent tooltip label for dev regions */
+.dev-region-label {
+  background: rgba(0, 0, 0, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 3px !important;
+  color: #fff !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  padding: 2px 5px !important;
+  white-space: nowrap !important;
+  box-shadow: none !important;
+  pointer-events: none;
+}
+
+.dev-region-label::before { display: none !important; }
+
 /* Responsive */
 @media (max-width: 768px) {
   .osrs-map-section {

@@ -82,7 +82,7 @@ export const mapRegions = {
     name: "Karamja",
     category: REGION_CATEGORIES.OVERWORLD,
     bounds: { x: 14, y: 68, width: 12, height: 15 },
-    nearbyRegions: ["port_sarim", "ape_atoll", "mos_le_harmless"]
+    nearbyRegions: ["port_sarim", "ape_atoll", "mos_le_harmless", "feldip_hills"]
   },
 
   // Al Kharid
@@ -127,7 +127,16 @@ export const mapRegions = {
     name: "Yanille",
     category: REGION_CATEGORIES.OVERWORLD,
     bounds: { x: 6, y: 60, width: 6, height: 6 },
-    nearbyRegions: ["ardougne"]
+    nearbyRegions: ["ardougne", "feldip_hills"]
+  },
+
+  // Feldip Hills
+  feldip_hills: {
+    id: "feldip_hills",
+    name: "Feldip Hills",
+    category: REGION_CATEGORIES.OVERWORLD,
+    bounds: { x: 6, y: 68, width: 8, height: 8 },
+    nearbyRegions: ["yanille", "karamja", "ape_atoll"]
   },
 
   // Camelot/Catherby
@@ -437,8 +446,9 @@ export const specialLocations = {
 // the aliased special location so that map clicks and side-panel clicks
 // are treated as the same guess (consistent temperature, deduplication, etc.).
 export const regionAliases = {
-  isle_of_souls: "soul_wars",
-  void_knights_outpost: "pest_control"
+  void_knights_outpost: "pest_control",
+  stranglewood: "varlamore",
+  isle_of_souls: "soul_wars"
 };
 
 // Mapping from music track locations to region IDs
@@ -563,7 +573,70 @@ export const locationToRegion = {
   "Login screen": "login_screen",
   "Player-owned house": "player_owned_house",
   "Starting areas": "lumbridge",
-  "Farming Guild": "hosidius"
+  "Farming Guild": "hosidius",
+
+  // Lumbridge area sub-locations
+  "Lumbridge Castle Cellar": "lumbridge",
+  "Lumbridge Farm (East)": "lumbridge",
+  "Path: Lumbridge to Draynor": "lumbridge",
+  "North of Lumbridge": "lumbridge",
+
+  // Draynor sub-locations
+  "Draynor Market": "draynor",
+
+  // Varrock sub-locations
+  "Cooks' Guild": "varrock",
+  "Varrock East Mine": "varrock",
+  "South Varrock Stone Circle": "varrock",
+  "Varrock Southwest Mine": "varrock",
+  "Edgeville": "varrock",
+
+  // Wilderness sub-locations
+  "Lava Maze (North)": "wilderness",
+  "Hobgoblin Mine": "wilderness",
+  "East Level 20 Wilderness": "wilderness",
+  "Wilderness (East of Boneyard)": "wilderness",
+  "Lava Maze (East)": "wilderness",
+  "North of Goblin Village": "wilderness",
+
+  // Falador / Asgarnia sub-locations
+  "North of Falador": "falador",
+  "Burthorpe": "troll_country",
+  "Farm South of Falador": "falador",
+  "Edgeville Monastery": "falador",
+  "Rimmington": "port_sarim",
+
+  // Karamja sub-locations
+  "Musa Point (Karamja)": "karamja",
+
+  // Ardougne / Kandarin sub-locations
+  "Port Khazard": "ardougne",
+  "Ardougne Market": "ardougne",
+  "East Ardougne Castle": "ardougne",
+  "Gnome Stronghold (Brimstail's Cave)": "camelot",
+  "Piscatoris Fishing Colony": "camelot",
+
+  // Al Kharid sub-locations
+  "Emir's Arena (North)": "al_kharid",
+  "Emir's Arena": "al_kharid",
+  "Al Kharid Mine": "al_kharid",
+
+  // Desert sub-locations
+  "Kalphite Hive Entrance": "desert",
+  "Desert Treasure II": "desert",
+
+  // Morytania sub-locations
+  "Slayer Tower (Roof)": "morytania",
+  "Stranglewood": "varlamore",
+
+  // Fremennik sub-locations
+  "Southwest of Rellekka": "fremennik",
+
+  // Tirannwn / Gauntlet
+  "The Gauntlet (Prifddinas)": "the_gauntlet",
+
+  // Zanaris (fairy realm, accessed via Lumbridge Swamp)
+  "Zanaris": "lumbridge"
 };
 
 // Get all regions (both map and special)
