@@ -1,0 +1,26 @@
+name: Generate Daily Words & Songs
+
+on:
+  schedule:
+    # Runs every 5 days at 00:05 UTC
+    - cron: '5 0 */5 * *'
+  workflow_dispatch: # Allow manual trigger from GitHub Actions UI
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install script dependencies
+        run: npm install @supabase/supabase-js
+
+      - name: Run generate-daily script
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/generate-daily.js

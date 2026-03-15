@@ -318,7 +318,7 @@ function App() {
     const targetSlot = targetItem.equipment?.slot || null;
     let slotClass, slotText;
     if (guessSlot && targetSlot) {
-      slotClass = guessSlot === targetSlot ? 'correct' : 'partial';
+      slotClass = guessSlot === targetSlot ? 'correct' : 'wrong';
       slotText = guessSlot;
     } else if (!guessSlot && !targetSlot) {
       slotClass = 'correct';
@@ -386,7 +386,10 @@ function App() {
                   <h4>Orange hints explained:</h4>
                   <ul>
                     <li><strong>Item name:</strong> Your guess shares a word with the answer (like "Rune scimitar" and "Rune platebody").</li>
-                    <li><strong>Item slot:</strong> Both items are equippable, but in different slots.</li>
+                  </ul>
+                  <h4>Red hints explained:</h4>
+                  <ul>
+                    <li><strong>Item slot:</strong> Red means the slot doesn't match — even if both items are equippable, they go in different slots.</li>
                   </ul>
                   <h4>Arrows:</h4>
                   <p>↑ means the target value is higher. ↓ means the target value is lower.</p>
