@@ -1,14 +1,21 @@
 {
   "short_name": "Scapedle",
-  "name": "Scapedle, the runescape take on the popular game WORDLE",
+  "name": "Scapedle — Daily OSRS Wordle",
+  "description": "Daily Old School RuneScape guessing game. Identify OSRS items from GE hints or locate a music track on the world map.",
   "icons": [
     {
       "src": "favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
-    }],
-  "start_url": ".",
+    },
+    {
+      "src": "soul_rune.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#1a1d23",
+  "background_color": "#1a1d23"
 }
