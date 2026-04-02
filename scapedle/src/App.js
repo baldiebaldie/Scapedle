@@ -32,6 +32,20 @@ const fetchDailySong = async (dateString) => {
   return data;
 };
 
+const saveDailyWord = async (dateString, item) => {
+  const { error } = await supabase
+    .from('daily_words')
+    .upsert({
+      date: dateString,
+      item_id: item.id,
+      item_name: item.name
+    }, { onConflict: 'date' });
+
+  if (error) {
+    console.error('Error saving daily word:', error);
+  }
+};
+
 const saveDailySong = async (dateString, song) => {
   const { error } = await supabase
     .from('daily_songs')
@@ -177,6 +191,16 @@ function App() {
           localStorage.removeItem('scapedle-daily-music-score');
         }
 
+        // Generate daily item locally using seeded random (fallback if Supabase has no row)
+        const dailyItemIndex = seededRandom(today + '-item') % tradeable.length;
+        const localDailyItem = tradeable[dailyItemIndex];
+        setDailyTarget(localDailyItem);
+
+        // Generate yesterday's item locally
+        const yesterdayItemIndex = seededRandom(yesterday + '-item') % tradeable.length;
+        const localYesterdayItem = tradeable[yesterdayItemIndex];
+        setYesterdayItem(localYesterdayItem);
+
         // Generate daily song locally using seeded random
         const songIndex = seededRandom(today + '-song') % musicTracks.length;
         setDailySong(musicTracks[songIndex]);
@@ -208,13 +232,17 @@ function App() {
                 .find(item => item.id === id);
 
             const todayData = await fetchDailyWord(today);
-            if (todayData) {
+            if (!todayData) {
+              await saveDailyWord(today, localDailyItem);
+            } else {
               const supabaseItem = findItemById(todayData.item_id);
               if (supabaseItem) setDailyTarget(supabaseItem);
             }
 
             const yesterdayData = await fetchDailyWord(yesterday);
-            if (yesterdayData) {
+            if (!yesterdayData) {
+              await saveDailyWord(yesterday, localYesterdayItem);
+            } else {
               const yesterdayWord = findItemById(yesterdayData.item_id);
               if (yesterdayWord) setYesterdayItem(yesterdayWord);
             }
