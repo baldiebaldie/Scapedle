@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.9cc0eaf0.css",
-    "main.js": "/static/js/main.d8ad190c.js",
+    "main.js": "/static/js/main.4d27b1ac.js",
     "static/js/453.75f7faa1.chunk.js": "/static/js/453.75f7faa1.chunk.js",
     "static/media/Login_background_(Farming).png": "/static/media/Login_background_(Farming).cc615b2ce5d4c68c889b.png",
     "static/media/Login_background_(Varlamore_The_Final_Dawn).png": "/static/media/Login_background_(Varlamore_The_Final_Dawn).ea88d290b0ad20799b6d.png",
@@ -32,11 +32,11 @@
     "static/media/Login_background_(Construction).png": "/static/media/Login_background_(Construction).5fd3fb746e6350b9a961.png",
     "index.html": "/index.html",
     "main.9cc0eaf0.css.map": "/static/css/main.9cc0eaf0.css.map",
-    "main.d8ad190c.js.map": "/static/js/main.d8ad190c.js.map",
+    "main.4d27b1ac.js.map": "/static/js/main.4d27b1ac.js.map",
     "453.75f7faa1.chunk.js.map": "/static/js/453.75f7faa1.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.9cc0eaf0.css",
-    "static/js/main.d8ad190c.js"
+    "static/js/main.4d27b1ac.js"
   ]
 }
