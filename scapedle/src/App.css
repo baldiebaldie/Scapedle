@@ -349,26 +349,49 @@
 .flash-overlay.flash-correct { animation: flashCorrect 0.8s ease-out; }
 
 /* Scrollbar styling */
+html,
+body,
+.suggestions,
+.guess-table {
+  scrollbar-color: #4a5060 #1a1d23;
+  scrollbar-width: thin;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
 .suggestions::-webkit-scrollbar,
 .guess-table::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
 .suggestions::-webkit-scrollbar-track,
 .guess-table::-webkit-scrollbar-track {
   background: #1a1d23;
   border-radius: 4px;
 }
 
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
 .suggestions::-webkit-scrollbar-thumb,
 .guess-table::-webkit-scrollbar-thumb {
   background: #4a5060;
   border-radius: 4px;
 }
 
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
 .suggestions::-webkit-scrollbar-thumb:hover,
 .guess-table::-webkit-scrollbar-thumb:hover {
   background: #5a6070;
+}
+
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner,
+.guess-table::-webkit-scrollbar-corner {
+  background: #1a1d23;
 }
 
 /* Help button and panel */
@@ -549,6 +572,29 @@
   box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
 }
 
+.play-btn.loading {
+  cursor: default;
+  background: linear-gradient(135deg, #2e4a30 0%, #1a2e1b 100%);
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.15);
+}
+
+.play-btn.loading:hover {
+  transform: none;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.play-btn-spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
 .audio-progress {
   flex: 1;
   height: 8px;
@@ -720,6 +766,53 @@
 
 .score-counter.score-counter-practice strong {
   color: #8a7a40;
+}
+
+.side-links {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 100;
+}
+
+.side-links-label {
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #ce9f52;
+  text-shadow: 0 0 8px rgba(206, 159, 82, 0.5);
+}
+
+.side-links-icons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.side-link {
+  display: inline-flex;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.side-link:hover {
+  opacity: 1;
+}
+
+.github-icon {
+  width: 28px;
+  height: 28px;
+  fill: #fff;
+}
+
+.kofi-icon {
+  width: 28px;
+  height: 28px;
+  fill: #fff;
 }
 
 /* ==========================================

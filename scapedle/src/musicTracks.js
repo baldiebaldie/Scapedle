@@ -109,7 +109,7 @@ export const musicTracks = [
   // Tirannwn & Elves
   { name: "Elven Mist", url: "Elven_Mist.ogg", location: "Tirannwn" },
   { name: "Lasting", url: "Lasting.ogg", location: "Lletya" },
-  { name: "Crystal Sword", url: "Crystal_Sword.ogg", location: "Tirannwn" },
+  { name: "Crystal Sword", url: "Crystal_Sword.ogg", location: ["Wilderness", "Ardougne"] },
   { name: "The Gauntlet", url: "The_Gauntlet.ogg", location: "The Gauntlet (Prifddinas)" },
 
   // Troll Country
@@ -147,19 +147,62 @@ export const musicTracks = [
   { name: "Museum Medley", url: "Museum_Medley.ogg", location: "Museum Camp" },
   { name: "Fossil Island Volcano", url: "Lava_is_Mine.ogg", location: "Volcanic Mine" },
 
-  // Raids & Bosses
+  // Raids
   { name: "Upper Depths", url: "Upper_Depths.ogg", location: "Chambers of Xeric" },
   { name: "Fire in the Deep", url: "Fire_in_the_Deep.ogg", location: "Chambers of Xeric" },
   { name: "Lower Depths", url: "Lower_Depths.ogg", location: "Chambers of Xeric" },
+  { name: "The Maiden's Anger", url: "The_Maiden%27s_Anger.ogg", location: "Theatre of Blood" },
+  { name: "The Nightmare Continues", url: "The_Nightmare_Continues.ogg", location: "Theatre of Blood" },
+  { name: "Arachnids of Vampyrium", url: "Arachnids_of_Vampyrium.ogg", location: "Theatre of Blood" },
+  { name: "Power of the Shadow Realm", url: "Power_of_the_Shadow_Realm.ogg", location: "Theatre of Blood" },
+  { name: "Last King of the Yarasa", url: "Last_King_of_the_Yarasa.ogg", location: "Theatre of Blood" },
+  { name: "The Fat Lady Sings", url: "The_Fat_Lady_Sings.ogg", location: "Theatre of Blood" },
   { name: "Amascut's Promise", url: "Amascut%27s_Promise.ogg", location: "Tombs of Amascut" },
-  { name: "Strangled", url: "Strangled.ogg", location: "Stranglewood" },
-  { name: "Lair of the Basilisk", url: "Lair_of_the_Basilisk.ogg", location: "Basilisk Knights" },
-  { name: "Inferno", url: "Inferno.ogg", location: "The Inferno" },
-  { name: "The Bane of Ashihama", url: "The_Bane_of_Ashihama.ogg", location: "The Nightmare" },
-  { name: "On Thin Ice", url: "On_Thin_Ice.ogg", location: "Vorkath" },
+  { name: "Jaws of Gluttony", url: "Jaws_of_Gluttony.ogg", location: "Tombs of Amascut" },
+  { name: "A Mother's Curse", url: "A_Mother%27s_Curse.ogg", location: "Tombs of Amascut" },
+  { name: "Ape-ex Predator", url: "Ape-ex_Predator.ogg", location: "Tombs of Amascut" },
+  { name: "Sands of Time", url: "Sands_of_Time.ogg", location: "Tombs of Amascut" },
+
+  // Bosses
   { name: "Bane", url: "Bane.ogg", location: "Corporeal Beast" },
   { name: "Coil", url: "Coil.ogg", location: "Zulrah" },
+  { name: "On Thin Ice", url: "On_Thin_Ice.ogg", location: "Vorkath" },
+  { name: "The Bane of Ashihama", url: "The_Bane_of_Ashihama.ogg", location: "The Nightmare" },
+  { name: "Inferno", url: "Inferno.ogg", location: "The Inferno" },
   { name: "The Leviathan", url: "Colossus_of_the_Deep.ogg", location: "Desert Treasure II" },
+  { name: "Blood Rush", url: "Blood_Rush.ogg", location: "Desert Treasure II" },
+  { name: "Eye See You", url: "Eye_See_You.ogg", location: "Desert Treasure II" },
+  { name: "Song of the Silent Choir", url: "Song_of_the_Silent_Choir.ogg", location: "Desert Treasure II" },
+  { name: "More Than Meets the Eye", url: "More_Than_Meets_the_Eye.ogg", location: "Phantom Muspah" },
+  { name: "The Spurned Demon", url: "The_Spurned_Demon.ogg", location: "Zalcano" },
+  { name: "Darkly Altared", url: "Darkly_Altared.ogg", location: "Skotizo" },
+  { name: "Sarachnis", url: "Sarachnis.ogg", location: "Sarachnis" },
+  { name: "Oh Rats!", url: "Oh_Rats!.ogg", location: "Scurrius" },
+  { name: "Insect Queen", url: "Insect_Queen.ogg", location: "Kalphite Queen" },
+  { name: "The Mad Mole", url: "The_Mad_Mole.ogg", location: "Giant Mole" },
+  { name: "Xenophobe", url: "Xenophobe.ogg", location: "Dagannoth Kings" },
+  { name: "A Thorn in My Side", url: "A_Thorn_in_My_Side.ogg", location: "Hespori" },
+  { name: "Box of Delights", url: "Box_of_Delights.ogg", location: "The Mimic" },
+  { name: "Roots and Flutes", url: "Roots_and_Flutes.ogg", location: "Bryophyta" },
+  { name: "The Moons of Ruin", url: "The_Moons_of_Ruin.ogg", location: "Perilous Moons" },
+  { name: "Are You Not Entertained", url: "Are_You_Not_Entertained.ogg", location: "Fortis Colosseum" },
+
+  // Slayer Bosses
+  { name: "Invader", url: "Invader.ogg", location: "Abyssal Sire" },
+  { name: "Maws Jaws & Claws", url: "Maws_Jaws_%26_Claws.ogg", location: "Cerberus" },
+  { name: "Troubled Waters", url: "Troubled_Waters.ogg", location: "Kraken" },
+  { name: "Devils May Care", url: "Devils_May_Care.ogg", location: "Thermonuclear Smoke Devil" },
+  { name: "Alchemical Attack!", url: "Alchemical_Attack!.ogg", location: "Alchemical Hydra" },
+  { name: "Noxious Awakening", url: "Noxious_Awakening.ogg", location: "Araxxor" },
+  { name: "Lair of the Basilisk", url: "Lair_of_the_Basilisk.ogg", location: "Basilisk Knights" },
+
+  // Wilderness Bosses
+  { name: "A Dangerous Game", url: "A_Dangerous_Game.ogg", location: ["Callisto", "Vet'ion", "Venenatis"] },
+  { name: "Attack 5", url: "Attack_5.ogg", location: "King Black Dragon" },
+  { name: "Scorpia Dances", url: "Scorpia_Dances.ogg", location: "Scorpia" },
+  { name: "Regal", url: "Regal.ogg", location: "Chaos Elemental" },
+  { name: "Deep Wildy", url: "Deep_Wildy.ogg", location: "Chaos Fanatic" },
+  { name: "Troubled", url: "Troubled.ogg", location: "Crazy Archaeologist" },
 
   // God Wars Dungeon
   { name: "Armageddon", url: "Armageddon.ogg", location: "God Wars Dungeon" },
@@ -174,6 +217,10 @@ export const musicTracks = [
   // Quests
   { name: "Monkey Madness", url: "Monkey_Madness.ogg", location: "Ape Atoll" },
   { name: "Monkey Badness", url: "Monkey_Badness.ogg", location: "Ape Atoll" },
+  { name: "The Dragon Slayer", url: "The_Dragon_Slayer.ogg", location: "Galvek" },
+  { name: "The Fragment", url: "The_Fragment.ogg", location: "Fragment of Seren" },
+  { name: "Upir Likhyi", url: "Upir_Likhyi.ogg", location: "Vanstrom Klause" },
+  { name: "Attack 2", url: "Attack_2.ogg", location: "Elvarg" },
   { name: "My Arm's Journey", url: "My_Arm%27s_Journey.ogg", location: "Weiss" },
 
   // Minigames

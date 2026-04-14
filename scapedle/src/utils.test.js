@@ -1,4 +1,4 @@
-import { seededRandom, getTodayString, getYesterdayString, getIndicator, getYear, hasMatchingWord } from './utils';
+import { seededRandom, getTodayString, getYesterdayString, getIndicator, getYear, hasMatchingWord, calculateScore } from './utils';
 
 describe('seededRandom', () => {
   test('returns the same value for the same seed', () => {
@@ -118,5 +118,35 @@ describe('hasMatchingWord', () => {
   test('does not match partial words', () => {
     // "run" should not match "rune"
     expect(hasMatchingWord('Run', 'Rune platebody')).toBe(false);
+  });
+});
+
+describe('calculateScore', () => {
+  test('returns 1000 for 1 guess', () => {
+    expect(calculateScore(1)).toBe(1000);
+  });
+
+  test('returns 500 for 2 guesses', () => {
+    expect(calculateScore(2)).toBe(500);
+  });
+
+  test('returns 250 for 3 guesses', () => {
+    expect(calculateScore(3)).toBe(250);
+  });
+
+  test('returns 125 for 4 guesses', () => {
+    expect(calculateScore(4)).toBe(125);
+  });
+
+  test('floors at 50 for 6+ guesses', () => {
+    expect(calculateScore(6)).toBe(50);
+    expect(calculateScore(10)).toBe(50);
+    expect(calculateScore(100)).toBe(50);
+  });
+
+  test('score decreases as guesses increase', () => {
+    expect(calculateScore(1)).toBeGreaterThan(calculateScore(2));
+    expect(calculateScore(2)).toBeGreaterThan(calculateScore(3));
+    expect(calculateScore(3)).toBeGreaterThan(calculateScore(4));
   });
 });

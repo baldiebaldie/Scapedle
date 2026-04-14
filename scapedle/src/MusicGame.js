@@ -57,21 +57,30 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
   const guessHistory = musicMode === 'daily' ? dailyGuessHistory : unlimitedGuessHistory;
   const songWon = musicMode === 'daily' ? dailySongWon : unlimitedSongWon;
 
-  // Get the correct region ID for the current song
-  const getCorrectRegionId = () => {
-    if (!currentSong) return null;
-    return locationToRegion[currentSong.location] || null;
+  // Get the correct region ID(s) for the current song
+  const getCorrectRegionIds = () => {
+    if (!currentSong) return [];
+    const loc = currentSong.location;
+    if (Array.isArray(loc)) {
+      return loc.map(l => locationToRegion[l]).filter(Boolean);
+    }
+    return locationToRegion[loc] ? [locationToRegion[loc]] : [];
   };
 
   const handleRegionGuess = (regionId, pinLatLng) => {
-    const correctRegionId = getCorrectRegionId();
-    if (!correctRegionId) return;
+    const correctRegionIds = getCorrectRegionIds();
+    if (!correctRegionIds.length) return;
 
     // Check if already guessed this region
     if (guessHistory.some(g => g.regionId === regionId)) return;
 
     const region = getRegionById(regionId);
-    const tempResult = calculateTemperature(regionId, correctRegionId);
+    // Use the best (hottest) temperature across all correct regions
+    const tempResults = correctRegionIds.map(id => calculateTemperature(regionId, id));
+    const tempOrder = [TEMPERATURE.CORRECT, TEMPERATURE.HOT, TEMPERATURE.WARM, TEMPERATURE.COLD, TEMPERATURE.FROZEN];
+    const tempResult = tempResults.reduce((best, curr) =>
+      tempOrder.indexOf(curr.temperature) < tempOrder.indexOf(best.temperature) ? curr : best
+    );
 
     const newGuess = {
       regionId,
@@ -209,8 +218,8 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
       )}
 
       <div className="audio-player">
-        <button className="play-btn" onClick={togglePlay} disabled={audioLoading}>
-          {audioLoading ? '…' : isPlaying ? '⏸' : '▶'}
+        <button className={`play-btn${audioLoading ? ' loading' : ''}`} onClick={togglePlay} disabled={audioLoading}>
+          {audioLoading ? <span className="play-btn-spinner" /> : isPlaying ? '⏸' : '▶'}
         </button>
         <div className="audio-progress">
           <div className="progress-bar" style={{ width: `${audioProgress}%` }} />
@@ -237,7 +246,7 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
       {songWon ? (
         <div className="win-message">
           <h2>{currentSong?.name}</h2>
-          <p className="location-hint">Unlocks: {currentSong?.location}</p>
+          <p className="location-hint">Unlocks: {Array.isArray(currentSong?.location) ? currentSong.location.join(' / ') : currentSong?.location}</p>
           <p>Guesses: {guessHistory.length}</p>
           <p className={`score-display ${musicMode === 'unlimited' ? 'score-practice' : ''}`}>
             {musicMode === 'daily' ? 'Daily score' : 'Practice score'}: {calculateScore(guessHistory.length)} pts

@@ -372,6 +372,157 @@ export const specialLocations = {
     category: REGION_CATEGORIES.BOSSES,
     nearbyRegions: ["zulrah", "vorkath"]
   },
+  abyssal_sire: {
+    id: "abyssal_sire",
+    name: "Abyssal Sire",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["smoke_devil", "kraken"]
+  },
+  cerberus: {
+    id: "cerberus",
+    name: "Cerberus",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["alchemical_hydra", "araxxor"]
+  },
+  kraken: {
+    id: "kraken",
+    name: "Kraken",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["abyssal_sire", "smoke_devil"]
+  },
+  smoke_devil: {
+    id: "smoke_devil",
+    name: "Smoke Devil",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["abyssal_sire", "kraken"]
+  },
+  alchemical_hydra: {
+    id: "alchemical_hydra",
+    name: "Alchemical Hydra",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["cerberus", "araxxor"]
+  },
+  araxxor: {
+    id: "araxxor",
+    name: "Araxxor",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["cerberus", "alchemical_hydra"]
+  },
+  phantom_muspah: {
+    id: "phantom_muspah",
+    name: "Phantom Muspah",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["vorkath", "the_whisperer"]
+  },
+  duke_sucellus: {
+    id: "duke_sucellus",
+    name: "Duke Sucellus",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["vardorvis", "the_whisperer", "leviathan"]
+  },
+  vardorvis: {
+    id: "vardorvis",
+    name: "Vardorvis",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["duke_sucellus", "the_whisperer", "leviathan"]
+  },
+  the_whisperer: {
+    id: "the_whisperer",
+    name: "The Whisperer",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["duke_sucellus", "vardorvis", "leviathan"]
+  },
+  leviathan: {
+    id: "leviathan",
+    name: "The Leviathan",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["duke_sucellus", "vardorvis", "the_whisperer"]
+  },
+  kalphite_queen: {
+    id: "kalphite_queen",
+    name: "Kalphite Queen",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["giant_mole", "dagannoth_kings"]
+  },
+  giant_mole: {
+    id: "giant_mole",
+    name: "Giant Mole",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["kalphite_queen", "scurrius"]
+  },
+  dagannoth_kings: {
+    id: "dagannoth_kings",
+    name: "Dagannoth Kings",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["kalphite_queen", "zulrah"]
+  },
+  sarachnis: {
+    id: "sarachnis",
+    name: "Sarachnis",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["scurrius", "skotizo"]
+  },
+  scurrius: {
+    id: "scurrius",
+    name: "Scurrius",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["sarachnis", "giant_mole"]
+  },
+  hespori: {
+    id: "hespori",
+    name: "Hespori",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["bryophyta", "sarachnis"]
+  },
+  zalcano: {
+    id: "zalcano",
+    name: "Zalcano",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["skotizo", "bryophyta"]
+  },
+  skotizo: {
+    id: "skotizo",
+    name: "Skotizo",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["zalcano", "sarachnis"]
+  },
+  bryophyta: {
+    id: "bryophyta",
+    name: "Bryophyta",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["hespori", "zalcano"]
+  },
+  the_mimic: {
+    id: "the_mimic",
+    name: "The Mimic",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: []
+  },
+  galvek: {
+    id: "galvek",
+    name: "Galvek",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["vorkath", "elvarg"]
+  },
+  fragment_of_seren: {
+    id: "fragment_of_seren",
+    name: "Fragment of Seren",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["zalcano", "the_gauntlet"]
+  },
+  vanstrom_klause: {
+    id: "vanstrom_klause",
+    name: "Vanstrom Klause",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["the_nightmare", "theatre_of_blood"]
+  },
+  elvarg: {
+    id: "elvarg",
+    name: "Elvarg",
+    category: REGION_CATEGORIES.BOSSES,
+    nearbyRegions: ["galvek", "vorkath"]
+  },
+
 
   // Minigames
   fight_caves: {
@@ -434,6 +585,18 @@ export const specialLocations = {
     category: REGION_CATEGORIES.MINIGAMES,
     nearbyRegions: ["wintertodt"]
   },
+  fortis_colosseum: {
+    id: "fortis_colosseum",
+    name: "Fortis Colosseum",
+    category: REGION_CATEGORIES.MINIGAMES,
+    nearbyRegions: ["perilous_moons"]
+  },
+  perilous_moons: {
+    id: "perilous_moons",
+    name: "Perilous Moons",
+    category: REGION_CATEGORIES.MINIGAMES,
+    nearbyRegions: ["fortis_colosseum"]
+  },
 
   // Other
   login_screen: {
@@ -456,7 +619,6 @@ export const specialLocations = {
 // are treated as the same guess (consistent temperature, deduplication, etc.).
 export const regionAliases = {
   void_knights_outpost: "pest_control",
-  stranglewood: "varlamore",
   isle_of_souls: "soul_wars"
 };
 
@@ -565,6 +727,41 @@ export const locationToRegion = {
   "The Nightmare": "the_nightmare",
   "The Gauntlet": "the_gauntlet",
   "Basilisk Knights": "morytania",
+  "Abyssal Sire": "abyssal_sire",
+  "Cerberus": "cerberus",
+  "Kraken": "kraken",
+  "Thermonuclear Smoke Devil": "smoke_devil",
+  "Alchemical Hydra": "alchemical_hydra",
+  "Araxxor": "araxxor",
+  "Phantom Muspah": "phantom_muspah",
+  "Duke Sucellus": "duke_sucellus",
+  "Vardorvis": "vardorvis",
+  "The Whisperer": "the_whisperer",
+  "The Leviathan": "leviathan",
+  "Kalphite Queen": "kalphite_queen",
+  "Giant Mole": "giant_mole",
+  "Dagannoth Kings": "dagannoth_kings",
+  "Sarachnis": "sarachnis",
+  "Scurrius": "scurrius",
+  "Hespori": "hespori",
+  "Zalcano": "zalcano",
+  "Skotizo": "skotizo",
+  "Bryophyta": "bryophyta",
+  "The Mimic": "the_mimic",
+  "Galvek": "galvek",
+  "Fragment of Seren": "fragment_of_seren",
+  "Vanstrom Klause": "vanstrom_klause",
+  "Elvarg": "elvarg",
+  "Fortis Colosseum": "fortis_colosseum",
+  "Perilous Moons": "perilous_moons",
+  "Callisto": "wilderness",
+  "Vet'ion": "wilderness",
+  "Venenatis": "wilderness",
+  "King Black Dragon": "wilderness",
+  "Scorpia": "wilderness",
+  "Chaos Elemental": "wilderness",
+  "Chaos Fanatic": "wilderness",
+  "Crazy Archaeologist": "wilderness",
 
   // Minigames
   "Fight Caves": "fight_caves",
@@ -636,7 +833,6 @@ export const locationToRegion = {
 
   // Morytania sub-locations
   "Slayer Tower (Roof)": "morytania",
-  "Stranglewood": "varlamore",
 
   // Fremennik sub-locations
   "Southwest of Rellekka": "fremennik",
