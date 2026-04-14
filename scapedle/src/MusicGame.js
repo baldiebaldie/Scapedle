@@ -53,6 +53,16 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
     if (initialDailyWon !== undefined) setDailySongWon(initialDailyWon);
   }, [initialDailyWon]);
 
+  // Stop and reset audio whenever the user switches between Daily and Unlimited
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    setIsPlaying(false);
+    setAudioProgress(0);
+    setAudioError(false);
+  }, [musicMode]);
+
   const currentSong = musicMode === 'daily' ? dailySong : unlimitedSong;
   const guessHistory = musicMode === 'daily' ? dailyGuessHistory : unlimitedGuessHistory;
   const songWon = musicMode === 'daily' ? dailySongWon : unlimitedSongWon;
