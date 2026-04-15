@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.9b2e9e16.css",
-    "main.js": "/static/js/main.eaef4d38.js",
+    "main.css": "/static/css/main.8764d6e4.css",
+    "main.js": "/static/js/main.95e6abbf.js",
     "static/js/453.75f7faa1.chunk.js": "/static/js/453.75f7faa1.chunk.js",
     "static/media/Login_background_(Farming).png": "/static/media/Login_background_(Farming).cc615b2ce5d4c68c889b.png",
     "static/media/Login_background_(Varlamore_The_Final_Dawn).png": "/static/media/Login_background_(Varlamore_The_Final_Dawn).ea88d290b0ad20799b6d.png",
@@ -31,12 +31,12 @@
     "static/media/Login_background_(old).png": "/static/media/Login_background_(old).dbb89d78128ca9b02601.png",
     "static/media/Login_background_(Construction).png": "/static/media/Login_background_(Construction).5fd3fb746e6350b9a961.png",
     "index.html": "/index.html",
-    "main.9b2e9e16.css.map": "/static/css/main.9b2e9e16.css.map",
-    "main.eaef4d38.js.map": "/static/js/main.eaef4d38.js.map",
+    "main.8764d6e4.css.map": "/static/css/main.8764d6e4.css.map",
+    "main.95e6abbf.js.map": "/static/js/main.95e6abbf.js.map",
     "453.75f7faa1.chunk.js.map": "/static/js/453.75f7faa1.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.9b2e9e16.css",
-    "static/js/main.eaef4d38.js"
+    "static/css/main.8764d6e4.css",
+    "static/js/main.95e6abbf.js"
   ]
 }
