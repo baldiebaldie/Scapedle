@@ -53,6 +53,15 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
     if (initialDailyWon !== undefined) setDailySongWon(initialDailyWon);
   }, [initialDailyWon]);
 
+  // Stop audio when the component unmounts (e.g. user switches to Items tab)
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+
   // Stop and reset audio whenever the user switches between Daily and Unlimited
   useEffect(() => {
     if (audioRef.current) {
@@ -209,7 +218,7 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
   };
 
   return (
-    <>
+    <div key={musicMode} className="game-animate">
       {/* Control row: mode tabs + score display */}
       <div className="control-row">
         <div className="mode-pill">
@@ -339,7 +348,7 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
           disabled={songWon}
         />
       )}
-    </>
+    </div>
   );
 }
 

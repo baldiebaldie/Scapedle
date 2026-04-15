@@ -491,137 +491,141 @@ function App() {
           </div>
 
           {/* ── Game body ── */}
-          <div className="game-body">
+          <div className="game-body" key={gameType + (gameType === 'items' ? gameMode : '')}>
+            <div className="game-animate">
 
-            {gameType === 'items' ? (
-              <>
-                {/* Control row: mode pill + daily scores */}
-                <div className="control-row">
-                  <div className="mode-pill">
-                    <button
-                      className={`mode-btn${gameMode === 'daily' ? ' active' : ''}`}
-                      onClick={() => { setGameMode('daily'); gtag('event', 'mode_switch', { mode: 'daily' }); }}
-                    >Daily</button>
-                    <button
-                      className={`mode-btn${gameMode === 'unlimited' ? ' active' : ''}`}
-                      onClick={() => { setGameMode('unlimited'); gtag('event', 'mode_switch', { mode: 'unlimited' }); }}
-                    >Unlimited</button>
+              {gameType === 'items' ? (
+                <>
+                  {/* Control row: mode pill + daily scores */}
+                  <div className="control-row">
+                    <div className="mode-pill">
+                      <button
+                        className={`mode-btn${gameMode === 'daily' ? ' active' : ''}`}
+                        onClick={() => { setGameMode('daily'); gtag('event', 'mode_switch', { mode: 'daily' }); }}
+                      >Daily</button>
+                      <button
+                        className={`mode-btn${gameMode === 'unlimited' ? ' active' : ''}`}
+                        onClick={() => { setGameMode('unlimited'); gtag('event', 'mode_switch', { mode: 'unlimited' }); }}
+                      >Unlimited</button>
+                    </div>
+                    <div className="score-display-row">
+                      <div className="score-piece">
+                        <span className="score-badge">Items</span>
+                        <span className="score-val">{dailyItemsScore !== null ? `${dailyItemsScore}` : '—'}</span>
+                      </div>
+                      <span className="score-sep">·</span>
+                      <div className="score-piece">
+                        <span className="score-badge">Music</span>
+                        <span className="score-val">{dailyMusicScore !== null ? `${dailyMusicScore}` : '—'}</span>
+                      </div>
+                      <span className="score-sep">·</span>
+                      <div className="score-piece">
+                        <span className="score-badge">Total</span>
+                        <span className="score-val">{totalScore !== null ? totalScore : '—'}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="score-display-row">
-                    <div className="score-piece">
-                      <span className="score-badge">Items</span>
-                      <span className="score-val">{dailyItemsScore !== null ? `${dailyItemsScore}` : '—'}</span>
-                    </div>
-                    <span className="score-sep">·</span>
-                    <div className="score-piece">
-                      <span className="score-badge">Music</span>
-                      <span className="score-val">{dailyMusicScore !== null ? `${dailyMusicScore}` : '—'}</span>
-                    </div>
-                    <span className="score-sep">·</span>
-                    <div className="score-piece">
-                      <span className="score-badge">Total</span>
-                      <span className="score-val">{totalScore !== null ? totalScore : '—'}</span>
-                    </div>
-                  </div>
-                </div>
 
-                {/* Info row: yesterday item + guess potential */}
-                {(gameMode === 'daily' && yesterdayItem) || !gameWon ? (
-                  <div className="info-row">
-                    {gameMode === 'daily' && yesterdayItem && (
-                      <div className="yesterday-pill">
-                        <span className="yday-label">Yesterday</span>
-                        <img
-                          src={`data:image/png;base64,${yesterdayItem.icon}`}
-                          alt={yesterdayItem.name}
-                          className="item-icon-sm"
-                        />
-                        <span className="yday-name">{yesterdayItem.name}</span>
-                      </div>
-                    )}
-                    {!gameWon && (
-                      <div className="guess-potential">
-                        <span className="pot-label">Guess now</span>
-                        <span className="pot-val">{calculateScore(guesses.length + 1)} pts</span>
-                      </div>
-                    )}
-                  </div>
-                ) : null}
-
-                {/* Main game area */}
-                {gameMode === 'daily' && !dailyTarget ? (
-                  <div className="no-daily-message">
-                    <p>Today's item hasn't been generated yet. Check back soon!</p>
-                    <button className="play-again-btn" onClick={() => window.location.reload()}>Refresh</button>
-                  </div>
-                ) : gameWon ? (
-                  <div className="win-panel">
-                    <div className="win-icon-wrap">
-                      <img src={`data:image/png;base64,${targetItem.icon}`} alt={targetItem.name} className="win-icon" />
-                    </div>
-                    <div className="win-item-name">{targetItem.name}</div>
-                    <div className="win-stats">
-                      <div className="win-stat">
-                        <span className="win-stat-label">Guesses</span>
-                        <span className="win-stat-val">{guesses.length}</span>
-                      </div>
-                      <div className="win-stat">
-                        <span className="win-stat-label">{gameMode === 'daily' ? 'Daily Score' : 'Score'}</span>
-                        <span className="win-stat-val score">{calculateScore(guesses.length)} pts</span>
-                      </div>
-                    </div>
-                    <div className="win-actions">
-                      {gameMode === 'daily' && (
-                        <button className={`btn-copy${copied ? ' copied' : ''}`} onClick={copyShareResult}>
-                          {copied ? 'Copied!' : 'Copy Result'}
-                        </button>
+                  {/* Info row: yesterday item + guess potential */}
+                  {(gameMode === 'daily' && yesterdayItem) || !gameWon ? (
+                    <div className="info-row">
+                      {gameMode === 'daily' && yesterdayItem && (
+                        <div className="yesterday-pill">
+                          <span className="yday-label">Yesterday</span>
+                          <img
+                            src={`data:image/png;base64,${yesterdayItem.icon}`}
+                            alt={yesterdayItem.name}
+                            className="item-icon-sm"
+                          />
+                          <span className="yday-name">{yesterdayItem.name}</span>
+                        </div>
                       )}
-                      {gameMode === 'unlimited' && (
-                        <button className="play-again-btn" onClick={handlePlayAgain}>Play Again</button>
+                      {!gameWon && (
+                        <div className="guess-potential">
+                          <span className="pot-label">Guess now</span>
+                          <span className="pot-val">{calculateScore(guesses.length + 1)} pts</span>
+                        </div>
                       )}
                     </div>
-                  </div>
-                ) : (
-                  <div className="search-wrap">
-                    <input
-                      type="text"
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      placeholder="Search for an item..."
-                    />
-                    {suggestions.length > 0 && (
-                      <div className="suggestions">
-                        {suggestions.map(item => (
-                          <div key={item.id} className="suggestion" onClick={() => handleGuess(item)}>
-                            {item.name}
-                          </div>
-                        ))}
+                  ) : null}
+
+                  {/* Main game area */}
+                  {gameMode === 'daily' && !dailyTarget ? (
+                    <div className="no-daily-message">
+                      <p>Today's item hasn't been generated yet. Check back soon!</p>
+                      <button className="play-again-btn" onClick={() => window.location.reload()}>Refresh</button>
+                    </div>
+                  ) : gameWon ? (
+                    <div className="win-panel">
+                      <div className="win-icon-wrap">
+                        <img src={`data:image/png;base64,${targetItem.icon}`} alt={targetItem.name} className="win-icon" />
                       </div>
-                    )}
-                  </div>
-                )}
+                      <div className="win-item-name">{targetItem.name}</div>
+                      <div className="win-stats">
+                        <div className="win-stat">
+                          <span className="win-stat-label">Guesses</span>
+                          <span className="win-stat-val">{guesses.length}</span>
+                        </div>
+                        <div className="win-stat">
+                          <span className="win-stat-label">{gameMode === 'daily' ? 'Daily Score' : 'Score'}</span>
+                          <span className="win-stat-val score">{calculateScore(guesses.length)} pts</span>
+                        </div>
+                      </div>
+                      <div className="win-actions">
+                        {gameMode === 'daily' && (
+                          <button className={`btn-copy${copied ? ' copied' : ''}`} onClick={copyShareResult}>
+                            {copied ? 'Copied!' : 'Copy Result'}
+                          </button>
+                        )}
+                        {gameMode === 'unlimited' && (
+                          <button className="play-again-btn" onClick={handlePlayAgain}>Play Again</button>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="search-wrap">
+                      <input
+                        type="text"
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        placeholder="Search for an item..."
+                      />
+                      {suggestions.length > 0 && (
+                        <div className="suggestions">
+                          {suggestions.map(item => (
+                            <div key={item.id} className="suggestion" onClick={() => handleGuess(item)}>
+                              {item.name}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-                {guesses.length > 0 && targetItem && (
-                  <div className="guess-table">
-                    {guesses.map(renderGuessRow)}
-                  </div>
-                )}
-              </>
-            ) : (
-              <MusicGame
-                dailySong={dailySong}
-                unlimitedSong={unlimitedSong}
-                yesterdaySong={yesterdaySong}
-                setUnlimitedSong={setUnlimitedSong}
-                initialDailyWon={initialSongWon}
-                onDailySongWon={(score) => { setDailyMusicScore(score); setInitialSongWon(true); }}
-                onGuessResult={handleGuessResult}
-                dailyItemsScore={dailyItemsScore}
-                dailyMusicScore={dailyMusicScore}
-              />
-            )}
-
+                </>
+              ) : (
+                <MusicGame
+                  dailySong={dailySong}
+                  unlimitedSong={unlimitedSong}
+                  yesterdaySong={yesterdaySong}
+                  setUnlimitedSong={setUnlimitedSong}
+                  initialDailyWon={initialSongWon}
+                  onDailySongWon={(score) => { setDailyMusicScore(score); setInitialSongWon(true); }}
+                  onGuessResult={handleGuessResult}
+                  dailyItemsScore={dailyItemsScore}
+                  dailyMusicScore={dailyMusicScore}
+                />
+              )}
+            </div>
           </div>
+
+          {gameType === 'items' && guesses.length > 0 && targetItem && (
+            <div className="guess-section">
+              <div className="guess-table">
+                {[...guesses].reverse().map(renderGuessRow)}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="side-links">
