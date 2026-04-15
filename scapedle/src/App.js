@@ -387,7 +387,7 @@ function App() {
       return [gv.match, vv.match, eqM, slotM, blV.match, ryV.match]
         .map(m => m ? '🟩' : '🟥').join('');
     }).join('\n');
-    const text = `Scapedle ${gameMode === 'daily' ? 'Daily' : 'Practice'}\n${guesses.length} guess${guesses.length !== 1 ? 'es' : ''}\n\n${emojiGrid}\nscapedle.com`;
+    const text = `Scapedle ${gameMode === 'daily' ? 'Daily' : 'Practice'} ${getTodayString()}\n${guesses.length} guess${guesses.length !== 1 ? 'es' : ''}\n\n${emojiGrid}\nhttps://scapedle.net`;
     navigator.clipboard.writeText(text).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

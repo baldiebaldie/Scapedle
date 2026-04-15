@@ -934,6 +934,21 @@ body::-webkit-scrollbar-thumb:hover,
 .guess-table::-webkit-scrollbar-thumb:hover { background: #5a6070; }
 
 /* ==========================================
+   WIDE SCREENS — progressive zoom scale-up
+   ========================================== */
+@media (min-width: 1440px) {
+  .App { zoom: 0.95; }
+}
+
+@media (min-width: 1920px) {
+  .App { zoom: 1.0; }
+}
+
+@media (min-width: 2560px) {
+  .App { zoom: 1.2; }
+}
+
+/* ==========================================
    MOBILE — applies only on screens ≤ 768px
    ========================================== */
 @media (max-width: 768px) {
