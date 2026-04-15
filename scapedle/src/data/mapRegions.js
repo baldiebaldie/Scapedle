@@ -271,13 +271,13 @@ export const mapRegions = {
     name: "Mos Le'Harmless",
     category: REGION_CATEGORIES.OVERWORLD,
     bounds: { x: 40, y: 75, width: 8, height: 8 },
-    nearbyRegions: ["karamja", "morytania"]
+    nearbyRegions: ["karamja", "morytania", "the_great_conch"]
   },
 
-  // Giant Conch (standalone island near Mos Le'Harmless)
-  giant_conch: {
-    id: "giant_conch",
-    name: "Giant Conch",
+  // The Great Conch (standalone island near Mos Le'Harmless)
+  the_great_conch: {
+    id: "the_great_conch",
+    name: "The Great Conch",
     category: REGION_CATEGORIES.OVERWORLD,
     bounds: { x: 48, y: 78, width: 5, height: 5 },
     nearbyRegions: ["mos_le_harmless"]
@@ -310,6 +310,57 @@ export const mapRegions = {
     category: REGION_CATEGORIES.OVERWORLD,
     bounds: { x: 12, y: 75, width: 6, height: 6 },
     nearbyRegions: ["port_sarim", "karamja"]
+  },
+
+  // New named regions
+  edgeville: {
+    id: "edgeville",
+    name: "Edgeville",
+    category: REGION_CATEGORIES.OVERWORLD,
+    bounds: { x: 20, y: 38, width: 7, height: 6 },
+    nearbyRegions: ["varrock", "wilderness", "burthorpe", "falador"]
+  },
+  draynor_manor: {
+    id: "draynor_manor",
+    name: "Draynor Manor",
+    category: REGION_CATEGORIES.OVERWORLD,
+    bounds: { x: 18, y: 48, width: 4, height: 3 },
+    nearbyRegions: ["draynor", "falador", "edgeville"]
+  },
+  taverley: {
+    id: "taverley",
+    name: "Taverley",
+    category: REGION_CATEGORIES.OVERWORLD,
+    bounds: { x: 14, y: 38, width: 5, height: 5 },
+    nearbyRegions: ["burthorpe", "falador", "camelot"]
+  },
+  digsite: {
+    id: "digsite",
+    name: "Digsite",
+    category: REGION_CATEGORIES.OVERWORLD,
+    bounds: { x: 30, y: 44, width: 4, height: 9 },
+    nearbyRegions: ["varrock", "al_kharid", "morytania"]
+  },
+  entrana: {
+    id: "entrana",
+    name: "Entrana",
+    category: REGION_CATEGORIES.OVERWORLD,
+    bounds: { x: 14, y: 45, width: 4, height: 3 },
+    nearbyRegions: ["port_sarim", "falador"]
+  },
+  tree_gnome_village: {
+    id: "tree_gnome_village",
+    name: "Tree Gnome Village",
+    category: REGION_CATEGORIES.OVERWORLD,
+    bounds: { x: 8, y: 58, width: 4, height: 4 },
+    nearbyRegions: ["ardougne", "yanille", "camelot"]
+  },
+  tree_gnome_stronghold: {
+    id: "tree_gnome_stronghold",
+    name: "Tree Gnome Stronghold",
+    category: REGION_CATEGORIES.OVERWORLD,
+    bounds: { x: 10, y: 36, width: 7, height: 8 },
+    nearbyRegions: ["camelot", "ardougne", "fremennik"]
   }
 };
 
@@ -525,6 +576,12 @@ export const specialLocations = {
 
 
   // Minigames
+  bounty_hunter: {
+    id: "bounty_hunter",
+    name: "Bounty Hunter",
+    category: REGION_CATEGORIES.MINIGAMES,
+    nearbyRegions: ["wilderness"]
+  },
   fight_caves: {
     id: "fight_caves",
     name: "Fight Caves",
@@ -630,7 +687,7 @@ export const locationToRegion = {
   "Lumbridge Castle": "lumbridge",
   "Lumbridge Swamp": "lumbridge",
   "Lumbridge farms": "lumbridge",
-  "Draynor Manor": "draynor",
+  "Draynor Manor": "draynor_manor",
 
   // Varrock & Wilderness
   "Varrock": "varrock",
@@ -697,8 +754,9 @@ export const locationToRegion = {
   "Mos Le'Harmless Caves": "mos_le_harmless",
   "Harmony Island": "mos_le_harmless",
 
-  // Giant Conch
-  "Giant Conch": "giant_conch",
+  // The Great Conch (old key kept for track compatibility)
+  "Giant Conch": "the_great_conch",
+  "The Great Conch": "the_great_conch",
 
   // Fossil Island
   "Fossil Island": "fossil_island",
@@ -763,7 +821,17 @@ export const locationToRegion = {
   "Chaos Fanatic": "wilderness",
   "Crazy Archaeologist": "wilderness",
 
+  // New named regions
+  "Taverley": "taverley",
+  "Digsite": "digsite",
+  "Entrana": "entrana",
+  "Tree Gnome Village": "tree_gnome_village",
+  "Tree Gnome Stronghold": "tree_gnome_stronghold",
+  "Grand Tree": "tree_gnome_stronghold",
+
   // Minigames
+  "Bounty Hunter": "bounty_hunter",
+  "Bounty Hunter Crater": "bounty_hunter",
   "Fight Caves": "fight_caves",
   "The Inferno": "inferno",
   "Pest Control": "pest_control",
@@ -795,7 +863,7 @@ export const locationToRegion = {
   "Varrock East Mine": "varrock",
   "South Varrock Stone Circle": "varrock",
   "Varrock Southwest Mine": "varrock",
-  "Edgeville": "varrock",
+  "Edgeville": "edgeville",
 
   // Wilderness sub-locations
   "Lava Maze (North)": "wilderness",
@@ -809,7 +877,7 @@ export const locationToRegion = {
   "North of Falador": "falador",
   "Burthorpe": "burthorpe",
   "Farm South of Falador": "falador",
-  "Edgeville Monastery": "falador",
+  "Edgeville Monastery": "edgeville",
   "Rimmington": "port_sarim",
 
   // Karamja sub-locations
@@ -819,7 +887,7 @@ export const locationToRegion = {
   "Port Khazard": "ardougne",
   "Ardougne Market": "ardougne",
   "East Ardougne Castle": "ardougne",
-  "Gnome Stronghold (Brimstail's Cave)": "camelot",
+  "Gnome Stronghold (Brimstail's Cave)": "tree_gnome_stronghold",
   "Piscatoris Fishing Colony": "camelot",
 
   // Al Kharid sub-locations

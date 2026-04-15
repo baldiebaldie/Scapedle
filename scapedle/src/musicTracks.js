@@ -144,7 +144,7 @@ export const musicTracks = [
   { name: "Fossil Island", url: "Preservation.ogg", location: "Fossil Island" },
   { name: "Fossil Island 2", url: "Preserved.ogg", location: "Fossil Island" },
   { name: "Fossil Island Underground", url: "Fossilised.ogg", location: "Wyvern Cave" },
-  { name: "Museum Medley", url: "Museum_Medley.ogg", location: "Museum Camp" },
+  { name: "Museum Medley", url: "Museum_Medley.ogg", location: "Varrock" },
   { name: "Fossil Island Volcano", url: "Lava_is_Mine.ogg", location: "Volcanic Mine" },
 
   // Raids

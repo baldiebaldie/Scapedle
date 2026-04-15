@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Rectangle, Tooltip, ZoomControl, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Rectangle, Tooltip, ZoomControl, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
@@ -38,58 +38,81 @@ const createHistoryPinIcon = (color = '#888888') => L.divIcon({
 
 // OSRS map bounds for regions (in Leaflet coordinates for CRS.Simple)
 const regionBounds = {
-  tutorial_island: [[-55, 100], [-50, 107]],
-  weiss: [[-16, 87], [-10, 94]],
-  stranglewood: [[-41.2, 6.2], [-35.9, 22.6]],
-  lovakengj: [[-23, 14], [-15, 27]],
-  arceuus: [[-23, 27], [-15, 42]],
-  shayzien: [[-35.6, 8.8], [-23, 27.4]],
-  hosidius: [[-36, 28], [-24, 42.8]],
-  piscarilius: [[-25, 38], [-18, 48]],
-  port_sarim: [[-50, 92], [-45, 100]],
-  draynor: [[-50, 93], [-40, 103]],
-  al_kharid: [[-50, 109], [-42, 116]],
-  lumbridge: [[-50, 103], [-42, 109]],
-  falador: [[-45, 88], [-36, 96]],
-  varrock: [[-42, 98], [-32, 112]],
-  camelot: [[-40, 68], [-32, 90]],
-  ardougne: [[-48, 68], [-40, 82]],
-  isle_of_souls: [[-69.2, 51.4], [-56.5, 65.5]],
-  feldip_hills: [[-66, 67.1], [-54.7, 79.4]],
-  yanille: [[-53, 66], [-47, 80]],
-  tirannwn: [[-55, 50], [-34, 68]],
-  fremennik: [[-30.2, 49.3], [-5.5, 82.8]],
-  burthorpe: [[-32.9, 85.2], [-28.4, 92.4]],
-  troll_country: [[-28.4, 82.6], [-14.9, 92.3]],
-  giant_conch: [[-89.6, 97.5], [-77.6, 111.1]],
-  ape_atoll: [[-73, 82], [-66, 94]],
-  karamja: [[-64, 80], [-48, 96]],
-  fossil_island: [[-29.2, 120], [-10, 139.5]],
-  mos_le_harmless: [[-64, 124.2], [-53.3, 138.6]],
-  void_knights_outpost: [[-60, 90], [-54, 100]],
-  morytania: [[-50, 114], [-30, 135]],
-  desert: [[-75, 100], [-50, 120]],
-  varlamore: [[-65.5, 10.9], [-41.8, 42]],
-  wilderness: [[-32.1, 92.6], [-11.9, 114]],
+  tutorial_island:       [[-54.6, 97.7], [-50, 103.1]],
+  weiss:                 [[-16, 87], [-10, 94]],
+  stranglewood:          [[-41.2, 6.2], [-35.9, 22.6]],
+  lovakengj:             [[-23, 14], [-15, 27]],
+  arceuus: [
+    [[-24.2, 27], [-15, 36.3]],
+    [[-17.9, 36.4], [-11.6, 47.3]]
+  ],
+  shayzien:              [[-35.6, 8.8], [-23, 27.4]],
+  hosidius:              [[-36, 28], [-27.1, 42.6]],
+  piscarilius:           [[-25, 36.6], [-18.2, 48]],
+  port_sarim:            [[-50, 92], [-45.2, 98.8]],
+  draynor:               [[-50, 98.9], [-41.7, 102.9]],
+  al_kharid:             [[-50.1, 108.3], [-41.9, 116.3]],
+  lumbridge:             [[-50, 103], [-41.9, 108.2]],
+  falador:               [[-44.8, 90.4], [-39.1, 98.7]],
+  varrock:               [[-41.7, 102.2], [-33.1, 111.1]],
+  camelot:               [[-38.7, 77.8], [-32.7, 89.6]],
+  ardougne: [
+    [[-47.8, 68], [-38.8, 84]],
+    [[-51.9, 75.2], [-47.6, 79.9]]
+  ],
+  isle_of_souls:         [[-69.2, 51.4], [-56.5, 65.5]],
+  feldip_hills:          [[-66, 67.1], [-54.7, 79.4]],
+  yanille:               [[-54.6, 73.6], [-51.9, 81.2]],
+  tirannwn:              [[-54.8, 50], [-33.9, 65.6]],
+  fremennik:             [[-30.2, 49.3], [-5.5, 82.8]],
+  burthorpe:             [[-32.9, 85.2], [-28.4, 92.4]],
+  troll_country:         [[-28.4, 82.6], [-14.9, 92.3]],
+  the_great_conch:       [[-90.3, 97.5], [-77.6, 113]],
+  ape_atoll:             [[-73, 82], [-66, 94]],
+  karamja:               [[-64, 80], [-48, 96]],
+  fossil_island:         [[-29.2, 120], [-10, 139.5]],
+  mos_le_harmless:       [[-64, 124.2], [-53.3, 138.6]],
+  void_knights_outpost:  [[-78.2, 77.7], [-72.2, 81.1]],
+  morytania: [
+    [[-49.8, 116.5], [-30, 135]],
+    [[-41.6, 114.5], [-29.4, 116.7]]
+  ],
+  desert:                [[-74.7, 102.6], [-50.7, 120]],
+  varlamore:             [[-65.5, 10.9], [-41.8, 42]],
+  wilderness:            [[-32.8, 92.5], [-11.9, 114]],
+  edgeville:             [[-39, 94.7], [-33, 102.2]],
+  draynor_manor:         [[-41.9, 98.7], [-39.1, 102.1]],
+  taverley:              [[-38.7, 89.8], [-33, 94.6]],
+  digsite:               [[-42.1, 111.3], [-33, 113.9]],
+  entrana:               [[-42, 86.3], [-38.8, 90.1]],
+  tree_gnome_village:    [[-51, 71.7], [-47.9, 75]],
+  tree_gnome_stronghold: [[-38.6, 66.3], [-31.8, 77.8]],
+  bounty_hunter:         [[-11, 111.2], [-3.6, 119.5]],
 };
 
+// Handles both single-box [[min],[max]] and multi-box [[[min],[max]], ...] formats
 function resolveLatLngToRegion(lat, lng) {
-  for (const [regionId, bounds] of Object.entries(regionBounds)) {
-    const [[minLat, minLng], [maxLat, maxLng]] = bounds;
-    if (lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng) {
-      return regionId;
-    }
+  const toBoxArray = (value) =>
+    typeof value[0][0] === 'number' ? [value] : value;
+
+  const inBox = ([[minLat, minLng], [maxLat, maxLng]]) =>
+    lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng;
+
+  for (const [regionId, value] of Object.entries(regionBounds)) {
+    if (toBoxArray(value).some(inBox)) return regionId;
   }
+
   let nearestRegion = null;
   let nearestDistance = Infinity;
-  for (const [regionId, bounds] of Object.entries(regionBounds)) {
-    const [[minLat, minLng], [maxLat, maxLng]] = bounds;
-    const centerLat = (minLat + maxLat) / 2;
-    const centerLng = (minLng + maxLng) / 2;
-    const distance = Math.sqrt((lat - centerLat) ** 2 + (lng - centerLng) ** 2);
-    if (distance < nearestDistance) {
-      nearestDistance = distance;
-      nearestRegion = regionId;
+  for (const [regionId, value] of Object.entries(regionBounds)) {
+    for (const [[minLat, minLng], [maxLat, maxLng]] of toBoxArray(value)) {
+      const centerLat = (minLat + maxLat) / 2;
+      const centerLng = (minLng + maxLng) / 2;
+      const distance = Math.sqrt((lat - centerLat) ** 2 + (lng - centerLng) ** 2);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestRegion = regionId;
+      }
     }
   }
   return nearestRegion;
@@ -104,6 +127,14 @@ const cornerHandleIcon = L.divIcon({
   iconAnchor: [5, 5]
 });
 
+const centerDotIcon = L.divIcon({
+  className: '',
+  html: '<div style="width:8px;height:8px;background:#fff;border:1.5px solid #000;border-radius:50%;cursor:pointer;opacity:0.7;"></div>',
+  iconSize: [8, 8],
+  iconAnchor: [4, 4],
+  popupAnchor: [0, -8]
+});
+
 const DEV_COLORS = [
   '#ff4444','#ff8c00','#ffd700','#7fff00','#00e5ff',
   '#1e90ff','#bf00ff','#ff69b4','#00fa9a','#ff6347',
@@ -113,56 +144,126 @@ const DEV_COLORS = [
   '#ff8c00','#20b2aa','#ff00ff','#6495ed','#f08080'
 ];
 
-function DevRegionOverlay({ devBounds, setDevBounds }) {
-  const regionList = Object.keys(devBounds);
-  const updateCorner = useCallback((regionId, corner, lat, lng) => {
-    setDevBounds(prev => {
-      const [[minLat, minLng], [maxLat, maxLng]] = prev[regionId];
+// Initialise dev boxes from the static regionBounds.
+// Multi-polygon entries (array of boxes) are expanded into one box each, all sharing the same label.
+function initDevBoxes() {
+  const isMulti = (v) => typeof v[0][0] !== 'number';
+  const boxes = [];
+  Object.entries(regionBounds).forEach(([label, value]) => {
+    const polys = isMulti(value) ? value : [value];
+    polys.forEach((bounds, i) => {
+      boxes.push({
+        id: `${label}_${i}`,
+        label,
+        bounds: bounds.map(pt => [...pt]),
+      });
+    });
+  });
+  return boxes;
+}
+
+// Popup content for a dev box — uses local state so typing doesn't lose focus
+function DevBoxPopupContent({ initialLabel, onLabelChange, onDelete }) {
+  const [label, setLabel] = useState(initialLabel);
+
+  useEffect(() => {
+    setLabel(initialLabel);
+  }, [initialLabel]);
+
+  return (
+    <div className="dev-box-popup">
+      <label className="dev-box-popup-label">Region label</label>
+      <input
+        className="dev-box-popup-input"
+        type="text"
+        value={label}
+        onChange={e => setLabel(e.target.value)}
+        onBlur={() => onLabelChange(label)}
+        placeholder="e.g. varrock"
+        autoFocus
+      />
+      <button className="dev-box-popup-delete" onClick={onDelete}>
+        Delete box
+      </button>
+    </div>
+  );
+}
+
+function DevBoxOverlay({ devBoxes, setDevBoxes, drawMode }) {
+  const updateCorner = useCallback((id, corner, lat, lng) => {
+    setDevBoxes(prev => prev.map(box => {
+      if (box.id !== id) return box;
+      const [[minLat, minLng], [maxLat, maxLng]] = box.bounds;
       const updated = {
         SW: [[lat, lng], [maxLat, maxLng]],
         NW: [[minLat, lng], [lat, maxLng]],
         NE: [[minLat, minLng], [lat, lng]],
         SE: [[lat, minLng], [maxLat, lng]],
-      }[corner] ?? prev[regionId];
-      return { ...prev, [regionId]: updated };
-    });
-  }, [setDevBounds]);
+      }[corner] ?? box.bounds;
+      return { ...box, bounds: updated };
+    }));
+  }, [setDevBoxes]);
+
+  const updateLabel = useCallback((id, label) => {
+    setDevBoxes(prev => prev.map(box => box.id === id ? { ...box, label } : box));
+  }, [setDevBoxes]);
+
+  const deleteBox = useCallback((id) => {
+    setDevBoxes(prev => prev.filter(box => box.id !== id));
+  }, [setDevBoxes]);
+
+  // Assign colours by label — boxes sharing the same label get the same colour
+  const labelColorMap = {};
+  let colorCounter = 0;
+  devBoxes.forEach(box => {
+    const key = box.label || `__unlabeled_${box.id}`;
+    if (!(key in labelColorMap)) {
+      labelColorMap[key] = DEV_COLORS[colorCounter % DEV_COLORS.length];
+      colorCounter++;
+    }
+  });
 
   return (
     <>
-      {regionList.map((regionId, idx) => {
-        const bounds = devBounds[regionId];
-        const [[minLat, minLng], [maxLat, maxLng]] = bounds;
-        const color = DEV_COLORS[idx % DEV_COLORS.length];
+      {devBoxes.map((box) => {
+        const [[minLat, minLng], [maxLat, maxLng]] = box.bounds;
+        const colorKey = box.label || `__unlabeled_${box.id}`;
+        const color = labelColorMap[colorKey];
         const centerLat = (minLat + maxLat) / 2;
         const centerLng = (minLng + maxLng) / 2;
         return (
-          <React.Fragment key={regionId}>
+          <React.Fragment key={box.id}>
             <Rectangle
-              bounds={bounds}
+              bounds={box.bounds}
               pathOptions={{ color, fillColor: color, fillOpacity: 0.15, weight: 2 }}
             >
               <Tooltip permanent direction="center" className="dev-region-label" offset={[0, 0]}>
-                {regionId}
+                {box.label || '(unlabeled)'}
               </Tooltip>
             </Rectangle>
-            <Marker position={[minLat, minLng]} icon={cornerHandleIcon} draggable
-              eventHandlers={{ dragend: e => { const p = e.target.getLatLng(); updateCorner(regionId, 'SW', p.lat, p.lng); } }}
+
+            <Marker position={[minLat, minLng]} icon={cornerHandleIcon} draggable={!drawMode}
+              eventHandlers={{ dragend: e => { const p = e.target.getLatLng(); updateCorner(box.id, 'SW', p.lat, p.lng); } }}
             />
-            <Marker position={[maxLat, minLng]} icon={cornerHandleIcon} draggable
-              eventHandlers={{ dragend: e => { const p = e.target.getLatLng(); updateCorner(regionId, 'NW', p.lat, p.lng); } }}
+            <Marker position={[maxLat, minLng]} icon={cornerHandleIcon} draggable={!drawMode}
+              eventHandlers={{ dragend: e => { const p = e.target.getLatLng(); updateCorner(box.id, 'NW', p.lat, p.lng); } }}
             />
-            <Marker position={[maxLat, maxLng]} icon={cornerHandleIcon} draggable
-              eventHandlers={{ dragend: e => { const p = e.target.getLatLng(); updateCorner(regionId, 'NE', p.lat, p.lng); } }}
+            <Marker position={[maxLat, maxLng]} icon={cornerHandleIcon} draggable={!drawMode}
+              eventHandlers={{ dragend: e => { const p = e.target.getLatLng(); updateCorner(box.id, 'NE', p.lat, p.lng); } }}
             />
-            <Marker position={[minLat, maxLng]} icon={cornerHandleIcon} draggable
-              eventHandlers={{ dragend: e => { const p = e.target.getLatLng(); updateCorner(regionId, 'SE', p.lat, p.lng); } }}
+            <Marker position={[minLat, maxLng]} icon={cornerHandleIcon} draggable={!drawMode}
+              eventHandlers={{ dragend: e => { const p = e.target.getLatLng(); updateCorner(box.id, 'SE', p.lat, p.lng); } }}
             />
-            <Marker
-              position={[centerLat, centerLng]}
-              icon={L.divIcon({ className: '', html: '', iconSize: [0, 0] })}
-              eventHandlers={{ click: () => console.log(`[DEV] ${regionId}: [[${minLat.toFixed(1)}, ${minLng.toFixed(1)}], [${maxLat.toFixed(1)}, ${maxLng.toFixed(1)}]]`) }}
-            />
+
+            <Marker position={[centerLat, centerLng]} icon={centerDotIcon}>
+              <Popup closeButton={true} autoClose={false} closeOnClick={false}>
+                <DevBoxPopupContent
+                  initialLabel={box.label}
+                  onLabelChange={label => updateLabel(box.id, label)}
+                  onDelete={() => deleteBox(box.id)}
+                />
+              </Popup>
+            </Marker>
           </React.Fragment>
         );
       })}
@@ -170,11 +271,87 @@ function DevRegionOverlay({ devBounds, setDevBounds }) {
   );
 }
 
-function formatBoundsCode(devBounds) {
-  const lines = Object.entries(devBounds).map(([id, [[minLat, minLng], [maxLat, maxLng]]]) => {
-    const fmt = (n) => Number(n.toFixed(1));
-    return `  ${id}: [[${fmt(minLat)}, ${fmt(minLng)}], [${fmt(maxLat)}, ${fmt(maxLng)}]],`;
+function DrawBoxHandler({ drawMode, onBoxCreated }) {
+  const map = useMap();
+  const startRef = useRef(null);
+  const draggingRef = useRef(false);
+  const [previewBounds, setPreviewBounds] = useState(null);
+
+  // Re-enable dragging if mouse leaves the map container while drawing
+  useEffect(() => {
+    if (!drawMode) return;
+    const container = map.getContainer();
+    const onLeave = () => {
+      if (draggingRef.current) {
+        draggingRef.current = false;
+        startRef.current = null;
+        setPreviewBounds(null);
+        map.dragging.enable();
+      }
+    };
+    container.addEventListener('mouseleave', onLeave);
+    return () => container.removeEventListener('mouseleave', onLeave);
+  }, [drawMode, map]);
+
+  useMapEvents({
+    mousedown(e) {
+      if (!drawMode) return;
+      map.dragging.disable();
+      startRef.current = e.latlng;
+      draggingRef.current = true;
+      setPreviewBounds(null);
+    },
+    mousemove(e) {
+      if (!drawMode || !draggingRef.current || !startRef.current) return;
+      const { lat: lat1, lng: lng1 } = startRef.current;
+      const { lat: lat2, lng: lng2 } = e.latlng;
+      setPreviewBounds([
+        [Math.min(lat1, lat2), Math.min(lng1, lng2)],
+        [Math.max(lat1, lat2), Math.max(lng1, lng2)],
+      ]);
+    },
+    mouseup(e) {
+      if (!drawMode || !draggingRef.current || !startRef.current) return;
+      draggingRef.current = false;
+      map.dragging.enable();
+      const { lat: lat1, lng: lng1 } = startRef.current;
+      const { lat: lat2, lng: lng2 } = e.latlng;
+      startRef.current = null;
+      setPreviewBounds(null);
+      const minLat = Math.min(lat1, lat2);
+      const minLng = Math.min(lng1, lng2);
+      const maxLat = Math.max(lat1, lat2);
+      const maxLng = Math.max(lng1, lng2);
+      // Ignore tiny accidental clicks
+      if (Math.abs(maxLat - minLat) > 0.5 && Math.abs(maxLng - minLng) > 0.5) {
+        onBoxCreated([[minLat, minLng], [maxLat, maxLng]]);
+      }
+    },
   });
+
+  if (!previewBounds) return null;
+  return (
+    <Rectangle
+      bounds={previewBounds}
+      pathOptions={{ color: '#fff', fillColor: '#fff', fillOpacity: 0.1, weight: 2, dashArray: '6 4' }}
+    />
+  );
+}
+
+function formatBoundsCode(devBoxes) {
+  const grouped = {};
+  for (const box of devBoxes) {
+    const key = box.label.trim() || `__unlabeled_${box.id}`;
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(box.bounds);
+  }
+  const fmt = n => Number(n.toFixed(1));
+  const fmtPair = ([[a, b], [c, d]]) => `[[${fmt(a)}, ${fmt(b)}], [${fmt(c)}, ${fmt(d)}]]`;
+  const lines = Object.entries(grouped).map(([label, arr]) =>
+    arr.length === 1
+      ? `  ${label}: ${fmtPair(arr[0])},`
+      : `  ${label}: [\n${arr.map(b => `    ${fmtPair(b)}`).join(',\n')}\n  ],`
+  );
   return `const regionBounds = {\n${lines.join('\n')}\n};`;
 }
 
@@ -224,25 +401,32 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
     resetAutoMinimizeTimer();
   };
 
-  const [devBounds, setDevBounds] = useState(() =>
-    Object.fromEntries(
-      Object.entries(regionBounds).map(([id, b]) => [id, b.map(pt => [...pt])])
-    )
-  );
+  const [devBoxes, setDevBoxes] = useState(initDevBoxes);
+  const [drawMode, setDrawMode] = useState(false);
   const [devCopied, setDevCopied] = useState(false);
 
+  // Escape cancels draw mode
+  useEffect(() => {
+    if (!isDevMode) return;
+    const onKey = (e) => { if (e.key === 'Escape') setDrawMode(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const handleBoxCreated = useCallback((bounds) => {
+    setDevBoxes(prev => [...prev, { id: `box_${Date.now()}`, label: '', bounds }]);
+    setDrawMode(false);
+  }, []);
+
   const handleDevCopy = () => {
-    navigator.clipboard.writeText(formatBoundsCode(devBounds));
+    navigator.clipboard.writeText(formatBoundsCode(devBoxes));
     setDevCopied(true);
     setTimeout(() => setDevCopied(false), 2000);
   };
 
   const handleDevReset = () => {
-    setDevBounds(
-      Object.fromEntries(
-        Object.entries(regionBounds).map(([id, b]) => [id, b.map(pt => [...pt])])
-      )
-    );
+    setDevBoxes(initDevBoxes());
+    setDrawMode(false);
   };
 
   const getRegionStatus = (regionId) => {
@@ -334,7 +518,7 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
           )}
         </div>
 
-        <div className="osrs-map-container">
+        <div className={`osrs-map-container${drawMode ? ' dev-draw-active' : ''}`}>
           <MapContainer
             center={[-51, 72]}
             zoom={5}
@@ -349,8 +533,13 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
           >
             <ZoomControl position="bottomleft" />
             <TileLayer url={tileUrl} minZoom={3} maxZoom={7} noWrap={true} bounds={mapBounds} />
-            <MapClickHandler onPinPlace={handlePinPlace} disabled={disabled} />
-            {isDevMode && <DevRegionOverlay devBounds={devBounds} setDevBounds={setDevBounds} />}
+            <MapClickHandler onPinPlace={handlePinPlace} disabled={disabled || drawMode} />
+            {isDevMode && (
+              <>
+                <DevBoxOverlay devBoxes={devBoxes} setDevBoxes={setDevBoxes} drawMode={drawMode} />
+                <DrawBoxHandler drawMode={drawMode} onBoxCreated={handleBoxCreated} />
+              </>
+            )}
             {pinPosition && (
               <Marker position={[pinPosition.lat, pinPosition.lng]} icon={createPinIcon('#e53935')}>
                 <Popup closeButton={false} autoClose={false} closeOnClick={false}>
@@ -425,13 +614,25 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
         <div className="dev-bounds-panel">
           <div className="dev-bounds-header">
             <span className="dev-badge">DEV MODE</span>
-            <span className="dev-hint">Drag corner handles to resize regions. Copy when done.</span>
+            <span className="dev-hint">
+              {drawMode
+                ? 'Click and drag on the map to draw a new box. Esc or Cancel to exit.'
+                : 'Drag corners to resize. Click centre dot to label or delete a box.'}
+            </span>
             <div className="dev-bounds-actions">
-              <button className="dev-btn dev-btn-copy" onClick={handleDevCopy}>{devCopied ? 'Copied!' : 'Copy Bounds'}</button>
+              <button
+                className={`dev-btn dev-btn-draw${drawMode ? ' dev-btn-draw--active' : ''}`}
+                onClick={() => setDrawMode(m => !m)}
+              >
+                {drawMode ? 'Cancel Draw' : 'Draw Box'}
+              </button>
+              <button className="dev-btn dev-btn-copy" onClick={handleDevCopy}>
+                {devCopied ? 'Copied!' : 'Copy Bounds'}
+              </button>
               <button className="dev-btn dev-btn-reset" onClick={handleDevReset}>Reset</button>
             </div>
           </div>
-          <pre className="dev-bounds-code">{formatBoundsCode(devBounds)}</pre>
+          <pre className="dev-bounds-code">{formatBoundsCode(devBoxes)}</pre>
         </div>
       )}
 
