@@ -86,6 +86,9 @@ function App() {
   // Main game type: 'items' or 'music'
   const [gameType, setGameType] = useState('items');
 
+  // Copy-result share button state
+  const [copied, setCopied] = useState(false);
+
   // Flash feedback via an overlay child div — never touches game-container's own animation
   const gameContainerRef = useRef(null);
   const flashOverlayRef = useRef(null);
@@ -332,6 +335,26 @@ function App() {
     setUnlimitedWon(false);
   };
 
+  const copyShareResult = () => {
+    const emojiGrid = guesses.map((g) => {
+      if (g.id === targetItem.id) return '🟩🟩🟩🟩🟩🟩';
+      const gv = getIndicator(g.ge_price, targetItem.ge_price);
+      const vv = getIndicator(g.volume, targetItem.volume);
+      const eqM = (!!g.equipment?.slot) === (!!targetItem.equipment?.slot);
+      const gS = g.equipment?.slot || null;
+      const tS = targetItem.equipment?.slot || null;
+      const slotM = (!gS && !tS) || (gS === tS);
+      const blV = getIndicator(g.buy_limit, targetItem.buy_limit);
+      const ryV = getIndicator(getYear(g.release_date), getYear(targetItem.release_date));
+      return [gv.match, vv.match, eqM, slotM, blV.match, ryV.match]
+        .map(m => m ? '🟩' : '🟥').join('');
+    }).join('\n');
+    const text = `Scapedle ${gameMode === 'daily' ? 'Daily' : 'Practice'}\n${guesses.length} guess${guesses.length !== 1 ? 'es' : ''}\n\n${emojiGrid}\nscapedle.com`;
+    navigator.clipboard.writeText(text).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const renderGuessRow = (guess) => {
     const geValue = getIndicator(guess.ge_price, targetItem.ge_price);
     const volume = getIndicator(guess.volume, targetItem.volume);
@@ -356,237 +379,251 @@ function App() {
       slotText = guessSlot || '-';
     }
 
+    const isCorrect = guess.id === targetItem.id;
+    const isPartial = !isCorrect && hasMatchingWord(guess.name, targetItem.name);
+
     return (
-      <div key={guess.id} className="guess-row">
-        <div className={`cell item-cell ${guess.id === targetItem.id ? 'correct' : hasMatchingWord(guess.name, targetItem.name) ? 'partial' : ''}`}>
+      <div key={guess.id} className="guess-card">
+        <div className={`card-header${isCorrect ? ' correct' : isPartial ? ' partial' : ''}`}>
           <img
             src={`data:image/png;base64,${guess.icon}`}
             alt={guess.name}
-            className="item-icon"
+            className="card-item-icon"
           />
-          {guess.name}
+          <span className="card-item-name">{guess.name}</span>
         </div>
-        <div className={`cell ${geValue.match ? 'correct' : 'wrong'}`}>
-          {guess.ge_price?.toLocaleString()} gp {!geValue.match && geValue.arrow}
-        </div>
-        <div className={`cell ${volume.match ? 'correct' : 'wrong'}`}>
-          {guess.volume?.toLocaleString()} {!volume.match && volume.arrow}
-        </div>
-        <div className={`cell ${equippableMatch ? 'correct' : 'wrong'}`}>
-          {guessEquippable ? 'Yes' : 'No'}
-        </div>
-        <div className={`cell ${slotClass}`}>
-          {slotText}
-        </div>
-        <div className={`cell ${buyLimit.match ? 'correct' : 'wrong'}`}>
-          {guess.buy_limit} {!buyLimit.match && buyLimit.arrow}
-        </div>
-        <div className={`cell ${releaseYear.match ? 'correct' : 'wrong'}`}>
-          {getYear(guess.release_date)} {!releaseYear.match && releaseYear.arrow}
+        <div className="card-attrs">
+          <div className={`attr-cell ${geValue.match ? 'correct' : 'wrong'}`}>
+            <span className="attr-label">GE Value</span>
+            <span className="attr-value">{guess.ge_price?.toLocaleString() ?? '?'} gp{!geValue.match && ` ${geValue.arrow}`}</span>
+          </div>
+          <div className={`attr-cell ${volume.match ? 'correct' : 'wrong'}`}>
+            <span className="attr-label">Volume</span>
+            <span className="attr-value">{guess.volume?.toLocaleString() ?? '?'}{!volume.match && ` ${volume.arrow}`}</span>
+          </div>
+          <div className={`attr-cell ${equippableMatch ? 'correct' : 'wrong'}`}>
+            <span className="attr-label">Equippable</span>
+            <span className="attr-value">{guessEquippable ? 'Yes' : 'No'}</span>
+          </div>
+          <div className={`attr-cell ${slotClass}`}>
+            <span className="attr-label">Slot</span>
+            <span className="attr-value">{slotText}</span>
+          </div>
+          <div className={`attr-cell ${buyLimit.match ? 'correct' : 'wrong'}`}>
+            <span className="attr-label">Buy Limit</span>
+            <span className="attr-value">{guess.buy_limit ?? '?'}{!buyLimit.match && ` ${buyLimit.arrow}`}</span>
+          </div>
+          <div className={`attr-cell ${releaseYear.match ? 'correct' : 'wrong'}`}>
+            <span className="attr-label">Year</span>
+            <span className="attr-value">{getYear(guess.release_date)}{!releaseYear.match && ` ${releaseYear.arrow}`}</span>
+          </div>
         </div>
       </div>
     );
   };
 
-  if (loading) return <div className="App"><header className="App-header"><p>Loading items...</p></header></div>;
+  if (loading) return <div className="App"><header className="App-header"><p style={{fontFamily:'Silkscreen,monospace',color:'#c9a227',fontSize:'12px'}}>Loading...</p></header></div>;
+
+  const totalScore = (dailyItemsScore !== null || dailyMusicScore !== null)
+    ? (dailyItemsScore ?? 0) + (dailyMusicScore ?? 0)
+    : null;
 
   return (
     <div className="App">
       <header className="App-header">
         <div ref={gameContainerRef} className="game-container">
           <div ref={flashOverlayRef} className="flash-overlay" />
-          <div className="help-button" onClick={() => setShowHelp(!showHelp)}>
-            ?
-          </div>
-          {showHelp && (
-            <div className="help-panel">
-              {gameType === 'items' ? (
-                <>
-                  <h3>How to Play — Items</h3>
-                  <p>Guess the random Old School RuneScape item!</p>
-                  <p>Type an item name and pick from the list. After each guess, you'll see hints about the target item.</p>
-                  <h4>What the colors mean:</h4>
-                  <ul>
-                    <li><span className="color-box green"></span> <strong>Green</strong> = Correct - This value matches exactly.</li>
-                    <li><span className="color-box orange"></span> <strong>Orange</strong> = Close - You're on the right track.</li>
-                    <li><span className="color-box red"></span> <strong>Red</strong> = Wrong - This value doesn't match.</li>
-                  </ul>
-                  <h4>Orange hints explained:</h4>
-                  <ul>
-                    <li><strong>Item name:</strong> Your guess shares a word with the answer (like "Rune scimitar" and "Rune platebody").</li>
-                  </ul>
-                  <h4>Red hints explained:</h4>
-                  <ul>
-                    <li><strong>Item slot:</strong> Red means the slot doesn't match — even if both items are equippable, they go in different slots.</li>
-                  </ul>
-                  <h4>Arrows:</h4>
-                  <p>↑ means the target value is higher. ↓ means the target value is lower.</p>
-                  <h4>Scoring:</h4>
-                  <p>Guess on your first try for <strong>1,000 pts</strong>. Each wrong guess halves your potential score — 500, 250, 125... down to a minimum of 50. Only your daily game counts toward today's total.</p>
-                </>
-              ) : (
-                <>
-                  <h3>How to Play — Music</h3>
-                  <p>A random OSRS music track is playing. Guess where in the game it unlocks!</p>
-                  <ol style={{ paddingLeft: '18px', color: '#ccc', margin: '8px 0' }}>
-                    <li>Press ▶ to listen to the track.</li>
-                    <li>Click a region on the map, or pick one from the Special Locations panel.</li>
-                    <li>Press <strong>Confirm Guess</strong> to submit.</li>
-                  </ol>
-                  <h4>Special Locations:</h4>
-                  <p>Use the panel beside the map for instanced areas like raids, bosses, and minigames that don't appear on the main map.</p>
-                  <h4>Scoring:</h4>
-                  <p>Guess on your first try for <strong>1,000 pts</strong>. Each wrong guess halves your potential score — 500, 250, 125... down to a minimum of 50. Only your daily game counts toward today's total.</p>
-                </>
-              )}
-            </div>
-          )}
-          <h1>
-            <img
-              src="https://oldschool.runescape.wiki/images/Soul_rune.png"
-              alt="Soul rune"
-              className="title-rune"
-            />
-            Scapedle
-            <img
-              src="https://oldschool.runescape.wiki/images/Soul_rune.png"
-              alt="Soul rune"
-              className="title-rune"
-            />
-          </h1>
 
-          <div className="game-type-tabs">
-            <button
-              className={`game-type-tab ${gameType === 'items' ? 'active' : ''}`}
-              onClick={() => { setGameType('items'); gtag('event', 'game_type_switch', { game_type: 'items' }); }}
-            >
-              Items
-            </button>
-            <button
-              className={`game-type-tab ${gameType === 'music' ? 'active' : ''}`}
-              onClick={() => { setGameType('music'); gtag('event', 'game_type_switch', { game_type: 'music' }); }}
-            >
-              Music
-            </button>
-          </div>
-
-          {/* Daily Score Panel */}
-          <div className="daily-score-panel">
-            <span className="daily-badge">DAILY</span>
-            <span>Items <strong>{dailyItemsScore !== null ? `${dailyItemsScore} pts` : '—'}</strong></span>
-            <span className="score-sep">·</span>
-            <span>Music <strong>{dailyMusicScore !== null ? `${dailyMusicScore} pts` : '—'}</strong></span>
-            <span className="score-sep">·</span>
-            <span className="score-total">Total <strong>{(dailyItemsScore !== null || dailyMusicScore !== null) ? `${(dailyItemsScore ?? 0) + (dailyMusicScore ?? 0)} pts` : '—'}</strong></span>
-          </div>
-
-          {gameType === 'items' ? (
-            <>
-              <div className="tab-container">
-                <button
-                  className={`tab ${gameMode === 'daily' ? 'active' : ''}`}
-                  onClick={() => { setGameMode('daily'); gtag('event', 'mode_switch', { mode: 'daily' }); }}
-                >
-                  Daily
-                </button>
-                <button
-                  className={`tab ${gameMode === 'unlimited' ? 'active' : ''}`}
-                  onClick={() => { setGameMode('unlimited'); gtag('event', 'mode_switch', { mode: 'unlimited' }); }}
-                >
-                  Unlimited
-                </button>
+          {/* ── Title band ── */}
+          <div className="title-band">
+            <button className="help-button" onClick={() => setShowHelp(!showHelp)}>?</button>
+            {showHelp && (
+              <div className="help-panel">
+                {gameType === 'items' ? (
+                  <>
+                    <h3>How to Play — Items</h3>
+                    <p>Guess the random Old School RuneScape item!</p>
+                    <p>Type an item name and pick from the list. After each guess you'll see hints about the target item.</p>
+                    <h4>Colours</h4>
+                    <ul>
+                      <li><span className="color-box green"></span> Green — exact match.</li>
+                      <li><span className="color-box orange"></span> Orange — close (name shares a word).</li>
+                      <li><span className="color-box red"></span> Red — wrong.</li>
+                    </ul>
+                    <h4>Arrows</h4>
+                    <p>↑ target is higher · ↓ target is lower</p>
+                    <h4>Scoring</h4>
+                    <p>1st guess = 1,000 pts. Each wrong guess halves the score down to 50 min. Daily only.</p>
+                  </>
+                ) : (
+                  <>
+                    <h3>How to Play — Music</h3>
+                    <p>A random OSRS track is playing. Guess where it unlocks!</p>
+                    <ol>
+                      <li>Press Play to listen.</li>
+                      <li>Click a region on the map or pick from Special Locations.</li>
+                      <li>Press Confirm Guess.</li>
+                    </ol>
+                    <h4>Scoring</h4>
+                    <p>1st guess = 1,000 pts. Each wrong guess halves the score down to 50 min. Daily only.</p>
+                  </>
+                )}
               </div>
+            )}
 
-              {gameMode === 'daily' && yesterdayItem && (
-                <div className="yesterday-word">
-                  <span>Yesterday's item:</span>
-                  <img
-                    src={`data:image/png;base64,${yesterdayItem.icon}`}
-                    alt={yesterdayItem.name}
-                    className="item-icon small"
-                  />
-                  <span>{yesterdayItem.name}</span>
-                </div>
-              )}
+            <div className="title-row">
+              <img src="https://oldschool.runescape.wiki/images/Soul_rune.png" alt="Soul rune" className="title-rune" />
+              <span className="title-text">SCAPEDLE</span>
+              <img src="https://oldschool.runescape.wiki/images/Soul_rune.png" alt="Soul rune" className="title-rune" />
+            </div>
+            <div className="title-sep"><span className="title-sep-diamond" /></div>
 
-              {gameMode === 'daily' && !dailyTarget ? (
-                <div className="no-daily-message">
-                  <p>Today's item hasn't been generated yet. Check back soon!</p>
-                  <button className="play-again-btn" onClick={() => window.location.reload()}>Refresh</button>
-                </div>
-              ) : gameWon ? (
-                <div className="win-message">
-                  <h2>
-                    {' '}
-                    <img
-                      src={`data:image/png;base64,${targetItem.icon}`}
-                      alt={targetItem.name}
-                      className="item-icon"
-                    />
-                    {targetItem.name}
-                  </h2>
-                  <p>Guesses: {guesses.length}</p>
-                  <p className={`score-display ${gameMode === 'unlimited' ? 'score-practice' : ''}`}>
-                    {gameMode === 'daily' ? 'Daily score' : 'Practice score'}: {calculateScore(guesses.length)} pts
-                  </p>
-                  {gameMode === 'unlimited' && (
-                    <button className="play-again-btn" onClick={handlePlayAgain}>
-                      Play Again
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <div className={`score-counter ${gameMode === 'unlimited' ? 'score-counter-practice' : ''}`}>
-                    {gameMode === 'daily' ? 'Daily' : 'Practice'} — guess now: <strong>{calculateScore(guesses.length + 1)} pts</strong>
+            <div className="game-type-pill">
+              <button
+                className={`gt-btn${gameType === 'items' ? ' active' : ''}`}
+                onClick={() => { setGameType('items'); gtag('event', 'game_type_switch', { game_type: 'items' }); }}
+              >Items</button>
+              <button
+                className={`gt-btn${gameType === 'music' ? ' active' : ''}`}
+                onClick={() => { setGameType('music'); gtag('event', 'game_type_switch', { game_type: 'music' }); }}
+              >Music</button>
+            </div>
+          </div>
+
+          {/* ── Game body ── */}
+          <div className="game-body">
+
+            {gameType === 'items' ? (
+              <>
+                {/* Control row: mode pill + daily scores */}
+                <div className="control-row">
+                  <div className="mode-pill">
+                    <button
+                      className={`mode-btn${gameMode === 'daily' ? ' active' : ''}`}
+                      onClick={() => { setGameMode('daily'); gtag('event', 'mode_switch', { mode: 'daily' }); }}
+                    >Daily</button>
+                    <button
+                      className={`mode-btn${gameMode === 'unlimited' ? ' active' : ''}`}
+                      onClick={() => { setGameMode('unlimited'); gtag('event', 'mode_switch', { mode: 'unlimited' }); }}
+                    >Unlimited</button>
                   </div>
-                  <div className="search-container">
-                  <input
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="Guess an item..."
-                  />
-                  {suggestions.length > 0 && (
-                    <div className="suggestions">
-                      {suggestions.map(item => (
-                        <div key={item.id} className="suggestion" onClick={() => handleGuess(item)}>
-                          {item.name}
-                        </div>
-                      ))}
+                  <div className="score-display-row">
+                    <div className="score-piece">
+                      <span className="score-badge">Items</span>
+                      <span className="score-val">{dailyItemsScore !== null ? `${dailyItemsScore}` : '—'}</span>
                     </div>
-                  )}
+                    <span className="score-sep">·</span>
+                    <div className="score-piece">
+                      <span className="score-badge">Music</span>
+                      <span className="score-val">{dailyMusicScore !== null ? `${dailyMusicScore}` : '—'}</span>
+                    </div>
+                    <span className="score-sep">·</span>
+                    <div className="score-piece">
+                      <span className="score-badge">Total</span>
+                      <span className="score-val">{totalScore !== null ? totalScore : '—'}</span>
+                    </div>
                   </div>
-                </>
-              )}
-
-              {guesses.length > 0 && targetItem && (
-                <div className="guess-table">
-                  <div className="guess-row header">
-                    <div className="cell item-cell">Item</div>
-                    <div className="cell">GE Value</div>
-                    <div className="cell">Daily Trade Volume</div>
-                    <div className="cell">Equippable</div>
-                    <div className="cell">Item Slot</div>
-                    <div className="cell">Buy Limit</div>
-                    <div className="cell">Release Date</div>
-                  </div>
-                  {guesses.map(renderGuessRow)}
                 </div>
-              )}
-            </>
-          ) : (
-            <MusicGame
-              dailySong={dailySong}
-              unlimitedSong={unlimitedSong}
-              yesterdaySong={yesterdaySong}
-              setUnlimitedSong={setUnlimitedSong}
-              initialDailyWon={initialSongWon}
-              onDailySongWon={(score) => { setDailyMusicScore(score); setInitialSongWon(true); }}
-              onGuessResult={handleGuessResult}
-            />
-          )}
+
+                {/* Info row: yesterday item + guess potential */}
+                {(gameMode === 'daily' && yesterdayItem) || !gameWon ? (
+                  <div className="info-row">
+                    {gameMode === 'daily' && yesterdayItem && (
+                      <div className="yesterday-pill">
+                        <span className="yday-label">Yesterday</span>
+                        <img
+                          src={`data:image/png;base64,${yesterdayItem.icon}`}
+                          alt={yesterdayItem.name}
+                          className="item-icon-sm"
+                        />
+                        <span className="yday-name">{yesterdayItem.name}</span>
+                      </div>
+                    )}
+                    {!gameWon && (
+                      <div className="guess-potential">
+                        <span className="pot-label">Guess now</span>
+                        <span className="pot-val">{calculateScore(guesses.length + 1)} pts</span>
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+
+                {/* Main game area */}
+                {gameMode === 'daily' && !dailyTarget ? (
+                  <div className="no-daily-message">
+                    <p>Today's item hasn't been generated yet. Check back soon!</p>
+                    <button className="play-again-btn" onClick={() => window.location.reload()}>Refresh</button>
+                  </div>
+                ) : gameWon ? (
+                  <div className="win-panel">
+                    <div className="win-icon-wrap">
+                      <img src={`data:image/png;base64,${targetItem.icon}`} alt={targetItem.name} className="win-icon" />
+                    </div>
+                    <div className="win-item-name">{targetItem.name}</div>
+                    <div className="win-stats">
+                      <div className="win-stat">
+                        <span className="win-stat-label">Guesses</span>
+                        <span className="win-stat-val">{guesses.length}</span>
+                      </div>
+                      <div className="win-stat">
+                        <span className="win-stat-label">{gameMode === 'daily' ? 'Daily Score' : 'Score'}</span>
+                        <span className="win-stat-val score">{calculateScore(guesses.length)} pts</span>
+                      </div>
+                    </div>
+                    <div className="win-actions">
+                      {gameMode === 'daily' && (
+                        <button className={`btn-copy${copied ? ' copied' : ''}`} onClick={copyShareResult}>
+                          {copied ? 'Copied!' : 'Copy Result'}
+                        </button>
+                      )}
+                      {gameMode === 'unlimited' && (
+                        <button className="play-again-btn" onClick={handlePlayAgain}>Play Again</button>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="search-wrap">
+                    <input
+                      type="text"
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      placeholder="Search for an item..."
+                    />
+                    {suggestions.length > 0 && (
+                      <div className="suggestions">
+                        {suggestions.map(item => (
+                          <div key={item.id} className="suggestion" onClick={() => handleGuess(item)}>
+                            {item.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {guesses.length > 0 && targetItem && (
+                  <div className="guess-table">
+                    {guesses.map(renderGuessRow)}
+                  </div>
+                )}
+              </>
+            ) : (
+              <MusicGame
+                dailySong={dailySong}
+                unlimitedSong={unlimitedSong}
+                yesterdaySong={yesterdaySong}
+                setUnlimitedSong={setUnlimitedSong}
+                initialDailyWon={initialSongWon}
+                onDailySongWon={(score) => { setDailyMusicScore(score); setInitialSongWon(true); }}
+                onGuessResult={handleGuessResult}
+                dailyItemsScore={dailyItemsScore}
+                dailyMusicScore={dailyMusicScore}
+              />
+            )}
+
+          </div>
         </div>
+
         <div className="side-links">
           <span className="side-links-label">Support the project</span>
           <div className="side-links-icons">

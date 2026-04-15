@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scapedle — UI Wireframe v2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root {
+    --gold:         #c9a227;
+    --gold-light:   #e0c060;
+    --gold-dark:    #9a7a1a;
+    --gold-glow:    rgba(201, 162, 39, 0.35);
+    --gold-glow-sm: rgba(201, 162, 39, 0.15);
+    --bg-deep:      #12141a;
+    --bg-card:      rgba(26, 29, 35, 0.97);
+    --bg-input:     #1e2129;
+    --bg-cell:      rgba(30, 33, 41, 0.85);
+    --border-subtle: rgba(255,255,255,0.07);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Silkscreen', 'Inter', sans-serif;
+    background: var(--bg-deep);
+    background-image: url('https://oldschool.runescape.wiki/images/Login_screen_background.png');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 16px 80px;
+    color: white;
+  }
+
+  /* ──────────── GAME CONTAINER ──────────── */
+  .game-container {
+    width: min(860px, 94vw);
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.09);
+    box-shadow: 0 12px 48px rgba(0,0,0,0.55);
+    overflow: hidden;
+    animation: fadeIn 0.4s ease-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ──────────── TITLE BAND ──────────── */
+  .title-band {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 36px 20px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .title-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .title-text {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--gold);
+    letter-spacing: 3px;
+    text-shadow:
+      0 0 20px var(--gold-glow),
+      0 0 50px rgba(201,162,39,0.12),
+      0 2px 6px rgba(0,0,0,0.7);
+    line-height: 1;
+  }
+  .title-rune {
+    width: 48px; height: 48px;
+    image-rendering: pixelated;
+    filter:
+      drop-shadow(0 0 8px rgba(138,43,226,0.75))
+      drop-shadow(0 0 20px rgba(138,43,226,0.3));
+    flex-shrink: 0;
+  }
+  /* Separator */
+  .title-sep {
+    width: min(380px, 70%);
+    height: 12px;
+    margin-top: 10px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .title-sep::before, .title-sep::after {
+    content: '';
+    position: absolute; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      var(--gold-dark) 18%,
+      var(--gold) 50%,
+      var(--gold-dark) 82%,
+      transparent 100%
+    );
+  }
+  .title-sep::before { top: 2px; }
+  .title-sep::after  { top: 6px; opacity: 0.45; }
+  .title-sep-diamond {
+    width: 8px; height: 8px;
+    background: var(--gold); transform: rotate(45deg);
+    position: relative; z-index: 1;
+    box-shadow: 0 0 8px var(--gold-glow);
+  }
+
+  /* ──────────── GAME-TYPE TABS (Items / Music) ──────────── */
+  .game-type-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 16px 36px 0;
+  }
+  .game-type-pill {
+    /* pill container */
+    display: inline-flex;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 4px;
+    gap: 2px;
+  }
+  .gt-btn {
+    padding: 9px 32px;
+    border: none; border-radius: 7px;
+    background: transparent;
+    color: #666;
+    font-size: 11px; font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+    white-space: nowrap;
+  }
+  .gt-btn:hover { color: #bbb; background: rgba(255,255,255,0.05); }
+  .gt-btn.active {
+    background: rgba(201,162,39,0.15);
+    color: var(--gold);
+    box-shadow: inset 0 0 0 1px rgba(201,162,39,0.35);
+  }
+
+  /* ──────────── GAME BODY ──────────── */
+  .game-body {
+    padding: 20px 36px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* ──────────── CONTROL ROW: mode tabs + score ──────────── */
+  .control-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* Mode toggle (Daily / Unlimited) — smaller pill */
+  .mode-pill {
+    display: inline-flex;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .mode-btn {
+    padding: 6px 20px;
+    border: none; border-radius: 6px;
+    background: transparent;
+    color: #555;
+    font-size: 10px; font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+  }
+  .mode-btn:hover { color: #999; }
+  .mode-btn.active {
+    background: rgba(255,255,255,0.07);
+    color: #ddd;
+  }
+
+  /* Score display */
+  .score-display {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 12px;
+    color: #555;
+  }
+  .score-display .score-piece { display: flex; align-items: center; gap: 5px; }
+  .score-display .score-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.7px;
+    text-transform: uppercase; color: #444;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px; padding: 2px 6px;
+  }
+  .score-display .score-val { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; color: var(--gold); }
+  .score-display .score-sep { color: #333; }
+
+  /* ──────────── INFO ROW: yesterday + potential ──────────── */
+  .info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .yesterday-pill {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: #555;
+  }
+  .yesterday-pill .yday-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.6px;
+    text-transform: uppercase; color: #444;
+  }
+  .yesterday-pill .yday-name { font-size: 9px; color: #888; font-weight: 400; }
+  .item-icon-sm {
+    width: 22px; height: 22px;
+    image-rendering: pixelated;
+    opacity: 0.85;
+  }
+  .guess-potential {
+    font-size: 12px; color: #555;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .guess-potential .pot-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.6px;
+    text-transform: uppercase; color: #444;
+  }
+  .guess-potential .pot-val { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; color: var(--gold-light); }
+
+  /* ──────────── SEARCH ──────────── */
+  .search-wrap {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  .search-wrap input {
+    width: 100%;
+    padding: 13px 18px;
+    background: var(--bg-input);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 9px;
+    color: white;
+    font-size: 11px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .search-wrap input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-glow-sm);
+  }
+  .search-wrap input::placeholder { color: #3a3f4a; }
+
+  /* ──────────── GUESS CARDS ──────────── */
+  .guess-table { display: flex; flex-direction: column; gap: 7px; }
+
+  .guess-card {
+    background: var(--bg-cell);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    overflow: hidden;
+    animation: slideIn 0.3s ease-out;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .guess-card:hover { border-color: rgba(255,255,255,0.12); }
+
+  .card-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .card-item-icon { width: 28px; height: 28px; image-rendering: pixelated; flex-shrink: 0; }
+  .card-item-name { font-size: 11px; font-weight: 700; color: #d8d8d8; }
+  .card-header.correct .card-item-name { color: #81c784; }
+  .card-header.partial .card-item-name { color: #ffb74d; }
+
+  /* 6-column attribute row — all attrs on one line */
+  .card-attrs {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .attr-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: 7px 10px;
+    border-right: 1px solid rgba(255,255,255,0.05);
+  }
+  .attr-cell:last-child { border-right: none; }
+
+  .attr-label {
+    font-family: 'Silkscreen', sans-serif;
+    font-size: 7px; font-weight: 700;
+    letter-spacing: 0.3px; text-transform: uppercase;
+    color: #444;
+    white-space: nowrap;
+  }
+  .attr-value {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 600;
+    white-space: nowrap; color: #c8c8c8;
+  }
+  .attr-arrow { font-size: 10px; opacity: 0.8; margin-left: 1px; }
+
+  /* State colour fills on the cell itself */
+  .attr-cell.correct {
+    background: rgba(46,125,50,0.25);
+    border-right-color: rgba(46,125,50,0.15);
+  }
+  .attr-cell.correct .attr-label { color: rgba(129,199,132,0.6); }
+  .attr-cell.correct .attr-value { color: #a5d6a7; }
+
+  .attr-cell.wrong {
+    background: rgba(198,40,40,0.2);
+    border-right-color: rgba(198,40,40,0.12);
+  }
+  .attr-cell.wrong .attr-label { color: rgba(239,154,154,0.5); }
+  .attr-cell.wrong .attr-value { color: #ef9a9a; }
+
+  .attr-cell.partial {
+    background: rgba(245,124,0,0.2);
+    border-right-color: rgba(245,124,0,0.12);
+  }
+  .attr-cell.partial .attr-label { color: rgba(255,183,77,0.55); }
+  .attr-cell.partial .attr-value { color: #ffcc80; }
+
+  /* ──────────── WIN PANEL ──────────── */
+  @keyframes winEntrance {
+    from { opacity: 0; transform: scale(0.9) translateY(10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes goldShimmer {
+    0%, 100% { border-color: var(--gold-dark); }
+    50%       { border-color: var(--gold-light); }
+  }
+  .win-panel {
+    border: 2px solid var(--gold-dark);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    background: rgba(18,20,26,0.8);
+    box-shadow:
+      0 0 0 4px rgba(18,20,26,0.85),
+      0 0 0 6px var(--gold-dark),
+      0 16px 48px rgba(0,0,0,0.6);
+    animation:
+      winEntrance 0.5s cubic-bezier(0.34,1.56,0.64,1) both,
+      goldShimmer 3.5s ease-in-out 0.6s infinite;
+    margin-bottom: 20px;
+  }
+  .win-icon-wrap {
+    width: 64px; height: 64px;
+    margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(201,162,39,0.08);
+    border: 1px solid rgba(201,162,39,0.25);
+    border-radius: 12px;
+    box-shadow: 0 0 20px var(--gold-glow-sm);
+  }
+  .win-icon { width: 44px; height: 44px; image-rendering: pixelated; }
+  .win-item-name {
+    font-size: 1rem; font-weight: 700;
+    color: var(--gold);
+    text-shadow: 0 0 14px var(--gold-glow);
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+  }
+  .win-stats {
+    display: flex; gap: 1px;
+    justify-content: center;
+    margin-bottom: 16px;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .win-stat {
+    flex: 1;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.02);
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+  .win-stat:last-child { border-right: none; }
+  .win-stat-label { font-size: 9px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #444; }
+  .win-stat-val { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 700; color: var(--gold); }
+  .win-stat-val.score { color: var(--gold-light); }
+
+  .win-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .btn-copy {
+    padding: 9px 20px;
+    background: rgba(201,162,39,0.1);
+    border: 1px solid rgba(201,162,39,0.35);
+    border-radius: 8px;
+    color: var(--gold-light);
+    font-size: 10px; font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .btn-copy:hover { background: rgba(201,162,39,0.2); }
+  .btn-play-again {
+    padding: 9px 24px;
+    background: linear-gradient(135deg, #1976d2, #1565c0);
+    border: none; border-radius: 8px;
+    color: white; font-size: 10px; font-weight: 600;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease;
+  }
+  .btn-play-again:hover { box-shadow: 0 4px 16px rgba(25,118,210,0.45); }
+
+  /* ──────────── AUDIO PLAYER ──────────── */
+  .audio-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .audio-player {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+  }
+  .play-btn {
+    width: 48px; height: 48px; flex-shrink: 0;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #2e7d32, #1b5e20);
+    color: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 12px rgba(46,125,50,0.35);
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+  }
+  .play-btn:hover { box-shadow: 0 0 20px rgba(46,125,50,0.6); transform: scale(1.06); }
+  .play-btn svg { display: block; }
+  .audio-progress-wrap {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .audio-progress-fill {
+    height: 100%;
+    width: 35%;
+    background: linear-gradient(90deg, #4caf50, #2e7d32);
+    border-radius: 3px;
+  }
+  .replay-btn {
+    width: 36px; height: 36px; flex-shrink: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: #666;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.2s ease, background 0.2s ease;
+  }
+  .replay-btn:hover { color: #bbb; background: rgba(255,255,255,0.08); }
+
+  .music-instructions {
+    font-size: 9px;
+    color: #444;
+    text-align: center;
+    padding: 8px 0 4px;
+    letter-spacing: 0.3px;
+  }
+
+  /* ──────────── MAP AREA ──────────── */
+  .map-outer {
+    position: relative;
+    width: 100%;
+    height: 420px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: #0a0c10;
+  }
+  /* Fake OSRS map tiles — dark teal/green terrain feel */
+  .map-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 35% 55%, rgba(20,50,30,0.9) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 50% at 70% 30%, rgba(10,30,40,0.9) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 60% at 50% 75%, rgba(15,35,20,0.8) 0%, transparent 60%),
+      linear-gradient(160deg, #0d1a14 0%, #091218 40%, #0c1810 100%);
+    opacity: 0.9;
+  }
+  /* Grid lines suggesting map tiles */
+  .map-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  /* Simulated pin */
+  .map-pin {
+    position: absolute;
+    left: 52%; top: 42%;
+    transform: translate(-50%, -100%);
+    width: 0; height: 0;
+  }
+  .map-pin-head {
+    width: 18px; height: 18px;
+    background: #e53935;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 0 8px rgba(229,57,53,0.6);
+    margin-left: 1px;
+  }
+
+  /* Left overlay — guess history */
+  .map-overlay-left {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 148px;
+    background: rgba(10,12,18,0.88);
+    backdrop-filter: blur(4px);
+    border-right: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    flex-direction: column;
+  }
+  .map-panel-header {
+    padding: 8px 10px;
+    font-size: 8px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    color: #555;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .map-panel-header span { color: #444; font-size: 9px; cursor: pointer; }
+  .map-guess-row {
+    display: flex; align-items: center;
+    padding: 7px 10px;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-left: 3px solid rgba(255,255,255,0.1);
+  }
+  .map-guess-row-name { font-size: 8px; color: #888; }
+
+  /* Right overlay — special locations */
+  .map-overlay-right {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 160px;
+    background: rgba(10,12,18,0.88);
+    backdrop-filter: blur(4px);
+    border-left: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    flex-direction: column;
+  }
+  .map-cat-header {
+    padding: 6px 10px;
+    font-size: 8px; font-weight: 700;
+    color: #555; text-transform: uppercase; letter-spacing: 0.4px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .map-loc-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 4px; padding: 6px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .map-loc-btn {
+    padding: 5px 4px;
+    font-size: 7px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px;
+    color: #666;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .map-loc-btn:hover { color: #aaa; background: rgba(255,255,255,0.07); }
+
+  /* Bottom confirm bar */
+  .map-confirm-bar {
+    position: absolute;
+    bottom: 0; left: 148px; right: 160px;
+    padding: 10px 14px;
+    background: rgba(10,12,18,0.92);
+    border-top: 2px solid rgba(76,175,80,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .map-region-label {
+    font-size: 9px; color: #888;
+  }
+  .map-region-label strong { color: #ccc; }
+  .map-confirm-btns { display: flex; gap: 8px; }
+  .btn-confirm {
+    padding: 7px 16px;
+    background: linear-gradient(135deg, #2e7d32, #1b5e20);
+    border: none; border-radius: 6px;
+    color: white; font-size: 9px; font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-cancel {
+    padding: 7px 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    color: #666; font-size: 9px;
+    cursor: pointer;
+  }
+
+  /* Music win panel */
+  .music-win-location {
+    font-size: 9px; color: #777;
+    margin-bottom: 14px;
+    letter-spacing: 0.3px;
+  }
+  .music-win-location strong { color: #aaa; }
+
+  /* ──────────── WIREFRAME SECTION LABELS ──────────── */
+  .wf-section {
+    margin-top: 40px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .wf-section:first-child { margin-top: 0; }
+  .wf-label {
+    margin-bottom: 10px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+    color: #6a3b9a; text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 1 — GAME IN PROGRESS
+     ═══════════════════════════════════════════ -->
+<div class="wf-section">
+  <div class="wf-label">Section 1 — Game in progress</div>
+
+  <div class="game-container">
+
+    <!-- Title band -->
+    <div class="title-band">
+      <div class="title-row">
+        <img src="https://oldschool.runescape.wiki/images/Soul_rune.png" alt="Soul rune" class="title-rune" />
+        <span class="title-text">SCAPEDLE</span>
+        <img src="https://oldschool.runescape.wiki/images/Soul_rune.png" alt="Soul rune" class="title-rune" />
+      </div>
+      <div class="title-sep"><span class="title-sep-diamond"></span></div>
+
+      <!-- Game-type tabs live in the title band -->
+      <div class="game-type-bar" style="padding:0; margin-top:10px;">
+        <div class="game-type-pill">
+          <button class="gt-btn active">Items</button>
+          <button class="gt-btn">Music</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game body -->
+    <div class="game-body">
+
+      <!-- Control row: mode pill + score -->
+      <div class="control-row">
+        <div class="mode-pill">
+          <button class="mode-btn active">Daily</button>
+          <button class="mode-btn">Unlimited</button>
+        </div>
+        <div class="score-display">
+          <div class="score-piece">
+            <span class="score-label">Items</span>
+            <span class="score-val">—</span>
+          </div>
+          <span class="score-sep">·</span>
+          <div class="score-piece">
+            <span class="score-label">Music</span>
+            <span class="score-val">—</span>
+          </div>
+          <span class="score-sep">·</span>
+          <div class="score-piece">
+            <span class="score-label">Total</span>
+            <span class="score-val">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info row: yesterday + potential score -->
+      <div class="info-row">
+        <div class="yesterday-pill">
+          <span class="yday-label">Yesterday</span>
+          <img src="https://oldschool.runescape.wiki/images/Abyssal_whip_detail.png" alt="item" class="item-icon-sm" />
+          <span class="yday-name">Abyssal whip</span>
+        </div>
+        <div class="guess-potential">
+          <span class="pot-label">Guess now</span>
+          <span class="pot-val">1,000 pts</span>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="search-wrap">
+        <input type="text" placeholder="Search for an item..." />
+      </div>
+
+      <!-- Guess cards -->
+      <div class="guess-table">
+
+        <!-- Wrong guess -->
+        <div class="guess-card">
+          <div class="card-header">
+            <img src="https://oldschool.runescape.wiki/images/Dragon_scimitar_detail.png" alt="" class="card-item-icon" />
+            <span class="card-item-name">Dragon scimitar</span>
+          </div>
+          <div class="card-attrs">
+            <div class="attr-cell wrong">
+              <span class="attr-label">GE Value</span>
+              <span class="attr-value">60,340 gp <span class="attr-arrow">↑</span></span>
+            </div>
+            <div class="attr-cell correct">
+              <span class="attr-label">Volume</span>
+              <span class="attr-value">12,400</span>
+            </div>
+            <div class="attr-cell correct">
+              <span class="attr-label">Equippable</span>
+              <span class="attr-value">Yes</span>
+            </div>
+            <div class="attr-cell wrong">
+              <span class="attr-label">Slot</span>
+              <span class="attr-value">weapon</span>
+            </div>
+            <div class="attr-cell wrong">
+              <span class="attr-label">Buy Limit</span>
+              <span class="attr-value">70 <span class="attr-arrow">↓</span></span>
+            </div>
+            <div class="attr-cell wrong">
+              <span class="attr-label">Year</span>
+              <span class="attr-value">2005 <span class="attr-arrow">↑</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Partial name match -->
+        <div class="guess-card">
+          <div class="card-header partial">
+            <img src="https://oldschool.runescape.wiki/images/Rune_scimitar_detail.png" alt="" class="card-item-icon" />
+            <span class="card-item-name">Rune scimitar</span>
+          </div>
+          <div class="card-attrs">
+            <div class="attr-cell wrong">
+              <span class="attr-label">GE Value</span>
+              <span class="attr-value">14,200 gp <span class="attr-arrow">↑</span></span>
+            </div>
+            <div class="attr-cell partial">
+              <span class="attr-label">Volume</span>
+              <span class="attr-value">38,000 <span class="attr-arrow">↓</span></span>
+            </div>
+            <div class="attr-cell correct">
+              <span class="attr-label">Equippable</span>
+              <span class="attr-value">Yes</span>
+            </div>
+            <div class="attr-cell wrong">
+              <span class="attr-label">Slot</span>
+              <span class="attr-value">weapon</span>
+            </div>
+            <div class="attr-cell correct">
+              <span class="attr-label">Buy Limit</span>
+              <span class="attr-value">125</span>
+            </div>
+            <div class="attr-cell partial">
+              <span class="attr-label">Year</span>
+              <span class="attr-value">2001 <span class="attr-arrow">↓</span></span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /guess-table -->
+
+    </div><!-- /game-body -->
+  </div><!-- /game-container -->
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     SECTION 2 — WIN STATE
+     ═══════════════════════════════════════════ -->
+<div class="wf-section">
+  <div class="wf-label">Section 2 — Win state (Daily)</div>
+
+  <div class="game-container">
+
+    <div class="title-band">
+      <div class="title-row">
+        <img src="https://oldschool.runescape.wiki/images/Soul_rune.png" alt="Soul rune" class="title-rune" />
+        <span class="title-text">SCAPEDLE</span>
+        <img src="https://oldschool.runescape.wiki/images/Soul_rune.png" alt="Soul rune" class="title-rune" />
+      </div>
+      <div class="title-sep"><span class="title-sep-diamond"></span></div>
+      <div style="margin-top:10px;">
+        <div class="game-type-pill">
+          <button class="gt-btn active">Items</button>
+          <button class="gt-btn">Music</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-body">
+
+      <div class="control-row">
+        <div class="mode-pill">
+          <button class="mode-btn active">Daily</button>
+          <button class="mode-btn">Unlimited</button>
+        </div>
+        <div class="score-display">
+          <div class="score-piece">
+            <span class="score-label">Items</span>
+            <span class="score-val">500</span>
+          </div>
+          <span class="score-sep">·</span>
+          <div class="score-piece">
+            <span class="score-label">Music</span>
+            <span class="score-val">—</span>
+          </div>
+          <span class="score-sep">·</span>
+          <div class="score-piece">
+            <span class="score-label">Total</span>
+            <span class="score-val">500</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Win panel -->
+      <div class="win-panel">
+        <div class="win-icon-wrap">
+          <img src="https://oldschool.runescape.wiki/images/Abyssal_whip_detail.png" alt="Abyssal whip" class="win-icon" />
+        </div>
+        <div class="win-item-name">Abyssal whip</div>
+        <div class="win-stats">
+          <div class="win-stat">
+            <span class="win-stat-label">Guesses</span>
+            <span class="win-stat-val">2</span>
+          </div>
+          <div class="win-stat">
+            <span class="win-stat-label">Daily Score</span>
+            <span class="win-stat-val score">500 pts</span>
+          </div>
+        </div>
+        <div class="win-actions">
+          <button class="btn-copy">Copy Result</button>
+        </div>
+      </div>
+
+      <!-- Guess history below win panel -->
+      <div class="guess-table">
+        <div class="guess-card">
+          <div class="card-header">
+            <img src="https://oldschool.runescape.wiki/images/Dragon_scimitar_detail.png" alt="" class="card-item-icon" />
+            <span class="card-item-name">Dragon scimitar</span>
+          </div>
+          <div class="card-attrs">
+            <div class="attr-cell wrong"><span class="attr-label">GE Value</span><span class="attr-value">60,340 gp <span class="attr-arrow">↑</span></span></div>
+            <div class="attr-cell correct"><span class="attr-label">Volume</span><span class="attr-value">12,400</span></div>
+            <div class="attr-cell correct"><span class="attr-label">Equippable</span><span class="attr-value">Yes</span></div>
+            <div class="attr-cell wrong"><span class="attr-label">Slot</span><span class="attr-value">weapon</span></div>
+            <div class="attr-cell wrong"><span class="attr-label">Buy Limit</span><span class="attr-value">70 <span class="attr-arrow">↓</span></span></div>
+            <div class="attr-cell wrong"><span class="attr-label">Year</span><span class="attr-value">2005 <span class="attr-arrow">↑</span></span></div>
+          </div>
+        </div>
+        <div class="guess-card">
+          <div class="card-header correct">
+            <img src="https://oldschool.runescape.wiki/images/Abyssal_whip_detail.png" alt="" class="card-item-icon" />
+            <span class="card-item-name">Abyssal whip</span>
+          </div>
+          <div class="card-attrs">
+            <div class="attr-cell correct"><span class="attr-label">GE Value</span><span class="attr-value">2.3M gp</span></div>
+            <div class="attr-cell correct"><span class="attr-label">Volume</span><span class="attr-value">12,400</span></div>
+            <div class="attr-cell correct"><span class="attr-label">Equippable</span><span class="attr-value">Yes</span></div>
+            <div class="attr-cell correct"><span class="attr-label">Slot</span><span class="attr-value">weapon</span></div>
+            <div class="attr-cell correct"><span class="attr-label">Buy Limit</span><span class="attr-value">125</span></div>
+            <div class="attr-cell correct"><span class="attr-label">Year</span><span class="attr-value">2005</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ═══════════════════════════════════════════
+     SECTION 3 — MUSIC GAME (guessing)
+     ═══════════════════════════════════════════ -->
+<div class="wf-section">
+  <div class="wf-label">Section 3 — Music game in progress</div>
+
+  <div class="game-container">
+
+    <div class="title-band">
+      <div class="title-row">
+        <img src="https://oldschool.runescape.wiki/images/Soul_rune.png" alt="Soul rune" class="title-rune" />
+        <span class="title-text">SCAPEDLE</span>
+        <img src="https://oldschool.runescape.wiki/images/Soul_rune.png" alt="Soul rune" class="title-rune" />
+      </div>
+      <div class="title-sep"><span class="title-sep-diamond"></span></div>
+      <div style="margin-top:10px;">
+        <div class="game-type-pill">
+          <button class="gt-btn">Items</button>
+          <button class="gt-btn active">Music</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-body">
+
+      <!-- Control row -->
+      <div class="control-row">
+        <div class="mode-pill">
+          <button class="mode-btn active">Daily</button>
+          <button class="mode-btn">Unlimited</button>
+        </div>
+        <div class="score-display">
+          <div class="score-piece">
+            <span class="score-label">Items</span>
+            <span class="score-val">750</span>
+          </div>
+          <span class="score-sep">·</span>
+          <div class="score-piece">
+            <span class="score-label">Music</span>
+            <span class="score-val">—</span>
+          </div>
+          <span class="score-sep">·</span>
+          <div class="score-piece">
+            <span class="score-label">Total</span>
+            <span class="score-val">750</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info row: yesterday + potential -->
+      <div class="info-row">
+        <div class="yesterday-pill">
+          <span class="yday-label">Yesterday</span>
+          <span class="yday-name">Scape Sad</span>
+        </div>
+        <div class="guess-potential">
+          <span class="pot-label">Guess now</span>
+          <span class="pot-val">500 pts</span>
+        </div>
+      </div>
+
+      <!-- Audio player -->
+      <div class="audio-section">
+        <div class="audio-player">
+          <button class="play-btn">
+          <!-- pause icon — two slim bars -->
+          <svg width="16" height="18" viewBox="0 0 16 18" fill="white" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="0" width="4.5" height="18" rx="1.5"/>
+            <rect x="10.5" y="0" width="4.5" height="18" rx="1.5"/>
+          </svg>
+        </button>
+          <div class="audio-progress-wrap">
+            <div class="audio-progress-fill"></div>
+          </div>
+          <button class="replay-btn">&#8635;</button>
+        </div>
+        <div class="music-instructions">Listen to the track, pin the location on the map, and confirm your guess</div>
+      </div>
+
+      <!-- Map -->
+      <div class="map-outer">
+        <div class="map-bg"></div>
+        <div class="map-grid"></div>
+        <div class="map-pin"><div class="map-pin-head"></div></div>
+
+        <!-- Left: guess history -->
+        <div class="map-overlay-left">
+          <div class="map-panel-header">Guesses <span>&#8722;</span></div>
+          <div class="map-guess-row">
+            <div class="map-guess-row-name">Lumbridge</div>
+          </div>
+          <div class="map-guess-row">
+            <div class="map-guess-row-name">Varrock</div>
+          </div>
+        </div>
+
+        <!-- Right: special locations -->
+        <div class="map-overlay-right">
+          <div class="map-panel-header">Special Locations <span>&#8722;</span></div>
+          <div class="map-cat-header">Raids <span>&#9660;</span></div>
+          <div class="map-loc-grid">
+            <div class="map-loc-btn">CoX</div>
+            <div class="map-loc-btn">ToB</div>
+            <div class="map-loc-btn">ToA</div>
+            <div class="map-loc-btn">Nex</div>
+          </div>
+          <div class="map-cat-header">Minigames <span>&#9660;</span></div>
+          <div class="map-loc-grid">
+            <div class="map-loc-btn">Pest Ctrl</div>
+            <div class="map-loc-btn">Barrows</div>
+            <div class="map-loc-btn">BA</div>
+            <div class="map-loc-btn">Trouble Brewing</div>
+          </div>
+        </div>
+
+        <!-- Confirm bar -->
+        <div class="map-confirm-bar">
+          <div class="map-region-label">Region: <strong>Varrock</strong></div>
+          <div class="map-confirm-btns">
+            <button class="btn-cancel">Cancel</button>
+            <button class="btn-confirm">Confirm Guess</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     SECTION 4 — MUSIC GAME WIN STATE
+     ═══════════════════════════════════════════ -->
+<div class="wf-section">
+  <div class="wf-label">Section 4 — Music game win state</div>
+
+  <div class="game-container">
+
+    <div class="title-band">
+      <div class="title-row">
+        <img src="https://oldschool.runescape.wiki/images/Soul_rune.png" alt="Soul rune" class="title-rune" />
+        <span class="title-text">SCAPEDLE</span>
+        <img src="https://oldschool.runescape.wiki/images/Soul_rune.png" alt="Soul rune" class="title-rune" />
+      </div>
+      <div class="title-sep"><span class="title-sep-diamond"></span></div>
+      <div style="margin-top:10px;">
+        <div class="game-type-pill">
+          <button class="gt-btn">Items</button>
+          <button class="gt-btn active">Music</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-body">
+
+      <div class="control-row">
+        <div class="mode-pill">
+          <button class="mode-btn active">Daily</button>
+          <button class="mode-btn">Unlimited</button>
+        </div>
+        <div class="score-display">
+          <div class="score-piece">
+            <span class="score-label">Items</span>
+            <span class="score-val">750</span>
+          </div>
+          <span class="score-sep">·</span>
+          <div class="score-piece">
+            <span class="score-label">Music</span>
+            <span class="score-val">500</span>
+          </div>
+          <span class="score-sep">·</span>
+          <div class="score-piece">
+            <span class="score-label">Total</span>
+            <span class="score-val">1,250</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Win panel -->
+      <div class="win-panel">
+        <div class="win-item-name">Scape Main Theme</div>
+        <div class="music-win-location">Unlocks at: <strong>Lumbridge</strong></div>
+        <div class="win-stats">
+          <div class="win-stat">
+            <span class="win-stat-label">Guesses</span>
+            <span class="win-stat-val">3</span>
+          </div>
+          <div class="win-stat">
+            <span class="win-stat-label">Daily Score</span>
+            <span class="win-stat-val score">500 pts</span>
+          </div>
+        </div>
+        <div class="win-actions">
+          <button class="btn-copy">Copy Result</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

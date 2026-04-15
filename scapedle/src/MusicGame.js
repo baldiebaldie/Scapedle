@@ -28,7 +28,7 @@ async function resolveWikiAudioUrl(filename) {
   }
 }
 
-function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, initialDailyWon, onDailySongWon, onGuessResult }) {
+function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, initialDailyWon, onDailySongWon, onGuessResult, dailyItemsScore, dailyMusicScore }) {
   const [musicMode, setMusicMode] = useState('daily');
   const [dailyGuessHistory, setDailyGuessHistory] = useState([]);
   const [unlimitedGuessHistory, setUnlimitedGuessHistory] = useState([]);
@@ -66,6 +66,11 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
   const currentSong = musicMode === 'daily' ? dailySong : unlimitedSong;
   const guessHistory = musicMode === 'daily' ? dailyGuessHistory : unlimitedGuessHistory;
   const songWon = musicMode === 'daily' ? dailySongWon : unlimitedSongWon;
+
+  // Compute total score
+  const totalScore = (dailyItemsScore !== null && dailyMusicScore !== null)
+    ? (dailyItemsScore ?? 0) + (dailyMusicScore ?? 0)
+    : null;
 
   // Get the correct region ID(s) for the current song
   const getCorrectRegionIds = () => {
@@ -205,36 +210,79 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
 
   return (
     <>
-      <div className="tab-container">
-        <button
-          className={`tab ${musicMode === 'daily' ? 'active' : ''}`}
-          onClick={() => setMusicMode('daily')}
-        >
-          Daily
-        </button>
-        <button
-          className={`tab ${musicMode === 'unlimited' ? 'active' : ''}`}
-          onClick={() => setMusicMode('unlimited')}
-        >
-          Unlimited
-        </button>
+      {/* Control row: mode tabs + score display */}
+      <div className="control-row">
+        <div className="mode-pill">
+          <button
+            className={`mode-btn${musicMode === 'daily' ? ' active' : ''}`}
+            onClick={() => setMusicMode('daily')}
+          >Daily</button>
+          <button
+            className={`mode-btn${musicMode === 'unlimited' ? ' active' : ''}`}
+            onClick={() => setMusicMode('unlimited')}
+          >Unlimited</button>
+        </div>
+        <div className="score-display-row">
+          <div className="score-piece">
+            <span className="score-badge">Items</span>
+            <span className="score-val">{dailyItemsScore !== null ? `${dailyItemsScore}` : '—'}</span>
+          </div>
+          <span className="score-sep">·</span>
+          <div className="score-piece">
+            <span className="score-badge">Music</span>
+            <span className="score-val">{dailyMusicScore !== null ? `${dailyMusicScore}` : '—'}</span>
+          </div>
+          <span className="score-sep">·</span>
+          <div className="score-piece">
+            <span className="score-badge">Total</span>
+            <span className="score-val">{totalScore !== null ? totalScore : '—'}</span>
+          </div>
+        </div>
       </div>
 
-      {musicMode === 'daily' && yesterdaySong && (
-        <div className="yesterday-word">
-          <span>Yesterday's song:</span>
-          <span>{yesterdaySong.name}</span>
+      {/* Info row: yesterday's song + guess potential */}
+      {(musicMode === 'daily' && yesterdaySong) || !songWon ? (
+        <div className="info-row">
+          {musicMode === 'daily' && yesterdaySong && (
+            <div className="yesterday-pill">
+              <span className="yday-label">Yesterday</span>
+              <span className="yday-name">{yesterdaySong.name}</span>
+            </div>
+          )}
+          {!songWon && (
+            <div className="guess-potential">
+              <span className="pot-label">Guess now</span>
+              <span className="pot-val">{calculateScore(guessHistory.length + 1)} pts</span>
+            </div>
+          )}
         </div>
-      )}
+      ) : null}
 
+      {/* Audio player */}
       <div className="audio-player">
-        <button className={`play-btn${audioLoading ? ' loading' : ''}`} onClick={togglePlay} disabled={audioLoading}>
-          {audioLoading ? <span className="play-btn-spinner" /> : isPlaying ? '⏸' : '▶'}
+        <button
+          className={`play-btn${audioLoading ? ' loading' : ''}`}
+          onClick={togglePlay}
+          disabled={audioLoading}
+          aria-label={isPlaying ? 'Pause' : 'Play'}
+        >
+          {audioLoading ? (
+            <span className="play-btn-spinner" />
+          ) : isPlaying ? (
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1" y="2" width="4.5" height="12" rx="1.5" />
+              <rect x="10.5" y="2" width="4.5" height="12" rx="1.5" />
+            </svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 2.5l11 5.5-11 5.5V2.5z" />
+            </svg>
+          )}
         </button>
         <div className="audio-progress">
           <div className="progress-bar" style={{ width: `${audioProgress}%` }} />
         </div>
-        <button className="replay-btn" onClick={replayAudio}>
+        <button className="replay-btn" onClick={replayAudio} aria-label="Replay">
           ↺
         </button>
       </div>
@@ -254,30 +302,42 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
       </div>
 
       {songWon ? (
-        <div className="win-message">
-          <h2>{currentSong?.name}</h2>
-          <p className="location-hint">Unlocks: {Array.isArray(currentSong?.location) ? currentSong.location.join(' / ') : currentSong?.location}</p>
-          <p>Guesses: {guessHistory.length}</p>
-          <p className={`score-display ${musicMode === 'unlimited' ? 'score-practice' : ''}`}>
-            {musicMode === 'daily' ? 'Daily score' : 'Practice score'}: {calculateScore(guessHistory.length)} pts
-          </p>
-          {musicMode === 'unlimited' && (
-            <button className="play-again-btn" onClick={handleSongPlayAgain}>
-              Play Again
-            </button>
-          )}
+        <div className="win-panel">
+          <div className="win-icon-wrap">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="16" cy="16" r="14" stroke="var(--gold)" strokeWidth="2" fill="none" opacity="0.4" />
+              <path d="M10 16l4 4 8-8" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <div className="win-item-name">{currentSong?.name}</div>
+          <div className="win-stats">
+            <div className="win-stat">
+              <span className="win-stat-label">Unlocks</span>
+              <span className="win-stat-val" style={{ fontSize: '12px' }}>
+                {Array.isArray(currentSong?.location) ? currentSong.location.join(' / ') : currentSong?.location}
+              </span>
+            </div>
+            <div className="win-stat">
+              <span className="win-stat-label">Guesses</span>
+              <span className="win-stat-val">{guessHistory.length}</span>
+            </div>
+            <div className="win-stat">
+              <span className="win-stat-label">{musicMode === 'daily' ? 'Daily Score' : 'Score'}</span>
+              <span className="win-stat-val score">{calculateScore(guessHistory.length)} pts</span>
+            </div>
+          </div>
+          <div className="win-actions">
+            {musicMode === 'unlimited' && (
+              <button className="play-again-btn" onClick={handleSongPlayAgain}>Play Again</button>
+            )}
+          </div>
         </div>
       ) : (
-        <>
-          <div className={`score-counter ${musicMode === 'unlimited' ? 'score-counter-practice' : ''}`}>
-            {musicMode === 'daily' ? 'Daily' : 'Practice'} — guess now: <strong>{calculateScore(guessHistory.length + 1)} pts</strong>
-          </div>
-          <OSRSMap
-            onRegionSelect={handleRegionGuess}
-            guessHistory={guessHistory}
-            disabled={songWon}
-          />
-        </>
+        <OSRSMap
+          onRegionSelect={handleRegionGuess}
+          guessHistory={guessHistory}
+          disabled={songWon}
+        />
       )}
     </>
   );
