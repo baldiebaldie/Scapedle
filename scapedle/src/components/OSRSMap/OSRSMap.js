@@ -370,7 +370,6 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
   const [pinPosition, setPinPosition] = useState(null);
   const [resolvedRegion, setResolvedRegion] = useState(null);
   const [expandedCategory, setExpandedCategory] = useState(null);
-  const [historyMinimized, setHistoryMinimized] = useState(false);
   const [specialMinimized, setSpecialMinimized] = useState(false);
   const autoMinimizeTimer = useRef(null);
 
@@ -383,7 +382,6 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
       clearTimeout(autoMinimizeTimer.current);
     }
     autoMinimizeTimer.current = setTimeout(() => {
-      setHistoryMinimized(true);
       setSpecialMinimized(true);
     }, 5000);
   }, []);
@@ -437,7 +435,6 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
 
   const handleRegionGuess = (id, pos) => {
     onRegionSelect(id, pos);
-    setHistoryMinimized(false);
     resetAutoMinimizeTimer();
   };
 
@@ -485,39 +482,6 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
   return (
     <div className="osrs-map-wrapper" onMouseMove={handleInteraction} onClick={handleInteraction}>
       <div className="osrs-map-section">
-        <div className={`guess-history ${historyMinimized ? 'minimized' : ''}`}>
-          <div className="panel-header">
-            <h4>Your Guesses</h4>
-            <button
-              className="minimize-btn"
-              onClick={(e) => { e.stopPropagation(); setHistoryMinimized(!historyMinimized); }}
-              title={historyMinimized ? "Expand history" : "Minimize history"}
-            >
-              {historyMinimized ? '▶' : '◀'}
-            </button>
-          </div>
-          {!historyMinimized && (
-            <div className="panel-content">
-              {guessHistory.length === 0 ? (
-                <div className="no-guesses-hint">No guesses yet</div>
-              ) : (
-                guessHistory.map((guess, idx) => {
-                  const isCorrect = guess.temperature === TEMPERATURE.CORRECT;
-                  return (
-                    <div
-                      key={idx}
-                      className="guess-row"
-                      style={{ borderLeftColor: isCorrect ? '#4caf50' : '#555' }}
-                    >
-                      <span className="guess-region">#{idx + 1} {guess.regionName}</span>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          )}
-        </div>
-
         <div className={`osrs-map-container${drawMode ? ' dev-draw-active' : ''}`}>
           <MapContainer
             center={[-51, 72]}
@@ -636,8 +600,8 @@ function OSRSMap({ onRegionSelect, guessHistory, disabled }) {
         </div>
       )}
 
-      {pinPosition && !disabled && (
-        <div className="pin-confirm-bar">
+      {!disabled && (
+        <div className="pin-confirm-bar" style={!pinPosition ? { visibility: 'hidden', pointerEvents: 'none' } : {}}>
           <div className="pin-confirm-info">
             <span className="pin-region-label">{resolvedRegion ? getRegionById(resolvedRegion)?.name || resolvedRegion : 'Unknown area'}</span>
             {resolvedRegion && guessHistory.some(g => g.regionId === resolvedRegion) && (

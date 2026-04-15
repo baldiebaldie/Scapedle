@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import './App.css';
 import { supabase } from './supabase';
 import { musicTracks } from './musicTracks';
@@ -65,6 +65,7 @@ function App() {
   const [allItems, setAllItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [inputValue, setInputValue] = useState('');
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [gameMode, setGameMode] = useState('daily');
 
   // Daily mode state
@@ -92,6 +93,33 @@ function App() {
   // Flash feedback via an overlay child div — never touches game-container's own animation
   const gameContainerRef = useRef(null);
   const flashOverlayRef = useRef(null);
+  const prevContainerHeightRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const el = gameContainerRef.current;
+    if (!el) return;
+
+    const targetHeight = el.offsetHeight;
+
+    if (prevContainerHeightRef.current !== null && prevContainerHeightRef.current !== targetHeight) {
+      const fromHeight = prevContainerHeightRef.current;
+      el.style.transition = 'none';
+      el.style.height = `${fromHeight}px`;
+      void el.offsetHeight; // force reflow so the browser registers the start state
+      el.style.transition = 'height 0.4s ease';
+      el.style.height = `${targetHeight}px`;
+
+      const timer = setTimeout(() => {
+        el.style.height = 'auto';
+        el.style.transition = '';
+      }, 450);
+
+      prevContainerHeightRef.current = targetHeight;
+      return () => clearTimeout(timer);
+    }
+
+    prevContainerHeightRef.current = targetHeight;
+  }, [gameType]);
 
   const handleGuessResult = (result) => {
     const el = flashOverlayRef.current;
@@ -100,6 +128,11 @@ function App() {
     el.classList.add(cls);
     setTimeout(() => el.classList.remove(cls), 800);
   };
+
+  // Music game mode + guess history (lifted from MusicGame so we can render them in the guess-section)
+  const [musicMode, setMusicMode] = useState('daily');
+  const [dailyMusicGuesses, setDailyMusicGuesses] = useState([]);
+  const [unlimitedMusicGuesses, setUnlimitedMusicGuesses] = useState([]);
 
   // Music mode state (passed to MusicGame component)
   const [dailySong, setDailySong] = useState(null);
@@ -220,6 +253,10 @@ function App() {
         if (savedDate === today) {
           const savedSongWon = localStorage.getItem('scapedle-daily-song-won') === 'true';
           setInitialSongWon(savedSongWon);
+          try {
+            const savedRegionGuesses = JSON.parse(localStorage.getItem('scapedle-daily-region-guesses') || '[]');
+            setDailyMusicGuesses(savedRegionGuesses);
+          } catch (e) { /* ignore */ }
         } else {
           localStorage.setItem('scapedle-daily-region-guesses', '[]');
           localStorage.setItem('scapedle-daily-song-won', 'false');
@@ -326,6 +363,7 @@ function App() {
     }
 
     setInputValue('');
+    setSelectedSuggestionIndex(-1);
   };
 
   const handlePlayAgain = () => {
@@ -434,42 +472,44 @@ function App() {
         <div ref={gameContainerRef} className="game-container">
           <div ref={flashOverlayRef} className="flash-overlay" />
 
+          {/* ── Help panel (outside title-band to avoid stacking context issues) ── */}
+          {showHelp && (
+            <div className="help-panel">
+              {gameType === 'items' ? (
+                <>
+                  <h3>How to Play — Items</h3>
+                  <p>Guess the random Old School RuneScape item!</p>
+                  <p>Type an item name and pick from the list. After each guess you'll see hints about the target item.</p>
+                  <h4>Colours</h4>
+                  <ul>
+                    <li><span className="color-box green"></span> Green — exact match.</li>
+                    <li><span className="color-box orange"></span> Orange — close (name shares a word).</li>
+                    <li><span className="color-box red"></span> Red — wrong.</li>
+                  </ul>
+                  <h4>Arrows</h4>
+                  <p>↑ target is higher · ↓ target is lower</p>
+                  <h4>Scoring</h4>
+                  <p>1st guess = 1,000 pts. Each wrong guess halves the score down to 50 min. Daily only.</p>
+                </>
+              ) : (
+                <>
+                  <h3>How to Play — Music</h3>
+                  <p>A random OSRS track is playing. Guess where it unlocks!</p>
+                  <ol>
+                    <li>Press Play to listen.</li>
+                    <li>Click a region on the map or pick from Special Locations.</li>
+                    <li>Press Confirm Guess.</li>
+                  </ol>
+                  <h4>Scoring</h4>
+                  <p>1st guess = 1,000 pts. Each wrong guess halves the score down to 50 min. Daily only.</p>
+                </>
+              )}
+            </div>
+          )}
+
           {/* ── Title band ── */}
           <div className="title-band">
             <button className="help-button" onClick={() => setShowHelp(!showHelp)}>?</button>
-            {showHelp && (
-              <div className="help-panel">
-                {gameType === 'items' ? (
-                  <>
-                    <h3>How to Play — Items</h3>
-                    <p>Guess the random Old School RuneScape item!</p>
-                    <p>Type an item name and pick from the list. After each guess you'll see hints about the target item.</p>
-                    <h4>Colours</h4>
-                    <ul>
-                      <li><span className="color-box green"></span> Green — exact match.</li>
-                      <li><span className="color-box orange"></span> Orange — close (name shares a word).</li>
-                      <li><span className="color-box red"></span> Red — wrong.</li>
-                    </ul>
-                    <h4>Arrows</h4>
-                    <p>↑ target is higher · ↓ target is lower</p>
-                    <h4>Scoring</h4>
-                    <p>1st guess = 1,000 pts. Each wrong guess halves the score down to 50 min. Daily only.</p>
-                  </>
-                ) : (
-                  <>
-                    <h3>How to Play — Music</h3>
-                    <p>A random OSRS track is playing. Guess where it unlocks!</p>
-                    <ol>
-                      <li>Press Play to listen.</li>
-                      <li>Click a region on the map or pick from Special Locations.</li>
-                      <li>Press Confirm Guess.</li>
-                    </ol>
-                    <h4>Scoring</h4>
-                    <p>1st guess = 1,000 pts. Each wrong guess halves the score down to 50 min. Daily only.</p>
-                  </>
-                )}
-              </div>
-            )}
 
             <div className="title-row">
               <img src="https://oldschool.runescape.wiki/images/Soul_rune.png" alt="Soul rune" className="title-rune" />
@@ -587,13 +627,31 @@ function App() {
                       <input
                         type="text"
                         value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
+                        onChange={(e) => { setInputValue(e.target.value); setSelectedSuggestionIndex(-1); }}
+                        onKeyDown={(e) => {
+                          if (!suggestions.length) return;
+                          if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            setSelectedSuggestionIndex(i => Math.min(i + 1, suggestions.length - 1));
+                          } else if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            setSelectedSuggestionIndex(i => Math.max(i - 1, 0));
+                          } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+                            e.preventDefault();
+                            handleGuess(suggestions[selectedSuggestionIndex]);
+                          }
+                        }}
                         placeholder="Search for an item..."
                       />
                       {suggestions.length > 0 && (
                         <div className="suggestions">
-                          {suggestions.map(item => (
-                            <div key={item.id} className="suggestion" onClick={() => handleGuess(item)}>
+                          {suggestions.map((item, idx) => (
+                            <div
+                              key={item.id}
+                              className={`suggestion${idx === selectedSuggestionIndex ? ' active' : ''}`}
+                              onClick={() => handleGuess(item)}
+                              onMouseEnter={() => setSelectedSuggestionIndex(idx)}
+                            >
                               {item.name}
                             </div>
                           ))}
@@ -614,15 +672,33 @@ function App() {
                   onGuessResult={handleGuessResult}
                   dailyItemsScore={dailyItemsScore}
                   dailyMusicScore={dailyMusicScore}
+                  musicMode={musicMode}
+                  setMusicMode={setMusicMode}
+                  dailyGuessHistory={dailyMusicGuesses}
+                  setDailyGuessHistory={setDailyMusicGuesses}
+                  unlimitedGuessHistory={unlimitedMusicGuesses}
+                  setUnlimitedGuessHistory={setUnlimitedMusicGuesses}
                 />
               )}
             </div>
           </div>
 
+          {/* Guess history — grows downward at the bottom of the container */}
           {gameType === 'items' && guesses.length > 0 && targetItem && (
             <div className="guess-section">
               <div className="guess-table">
                 {[...guesses].reverse().map(renderGuessRow)}
+              </div>
+            </div>
+          )}
+          {gameType === 'music' && (musicMode === 'daily' ? dailyMusicGuesses : unlimitedMusicGuesses).length > 0 && (
+            <div className="guess-section">
+              <div className="guess-table">
+                {[...(musicMode === 'daily' ? dailyMusicGuesses : unlimitedMusicGuesses)].reverse().map((guess, idx) => (
+                  <div key={idx} className="music-guess-card">
+                    <span className="music-guess-name">{guess.regionName}</span>
+                  </div>
+                ))}
               </div>
             </div>
           )}

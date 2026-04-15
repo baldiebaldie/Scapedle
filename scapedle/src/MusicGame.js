@@ -28,10 +28,7 @@ async function resolveWikiAudioUrl(filename) {
   }
 }
 
-function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, initialDailyWon, onDailySongWon, onGuessResult, dailyItemsScore, dailyMusicScore }) {
-  const [musicMode, setMusicMode] = useState('daily');
-  const [dailyGuessHistory, setDailyGuessHistory] = useState([]);
-  const [unlimitedGuessHistory, setUnlimitedGuessHistory] = useState([]);
+function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, initialDailyWon, onDailySongWon, onGuessResult, dailyItemsScore, dailyMusicScore, musicMode, setMusicMode, dailyGuessHistory, setDailyGuessHistory, unlimitedGuessHistory, setUnlimitedGuessHistory }) {
   const [dailySongWon, setDailySongWon] = useState(initialDailyWon || false);
   const [unlimitedSongWon, setUnlimitedSongWon] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -40,16 +37,8 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
   const [audioLoading, setAudioLoading] = useState(false);
   const audioRef = useRef(null);
 
-  // Load saved daily guess history from localStorage
+  // Sync won state when initialDailyWon changes (e.g. after Supabase fetch resolves)
   useEffect(() => {
-    const savedHistory = localStorage.getItem('scapedle-daily-region-guesses');
-    if (savedHistory) {
-      try {
-        setDailyGuessHistory(JSON.parse(savedHistory));
-      } catch (e) {
-        console.error('Error parsing saved guess history:', e);
-      }
-    }
     if (initialDailyWon !== undefined) setDailySongWon(initialDailyWon);
   }, [initialDailyWon]);
 

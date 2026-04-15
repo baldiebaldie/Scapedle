@@ -16,6 +16,7 @@
 .App {
   text-align: center;
   font-family: 'Silkscreen', monospace;
+  zoom: 0.9;
 }
 
 * {
@@ -29,7 +30,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 40px 16px;
   color: white;
   background-size: cover;
@@ -115,7 +116,7 @@
 /* ── Game container ── */
 .game-container {
   position: relative;
-  width: min(860px, 94vw);
+  width: min(1342px, 94vw);
   background: var(--bg-card);
   backdrop-filter: blur(12px);
   border-radius: 16px;
@@ -398,6 +399,7 @@
 
 .search-wrap input {
   width: 100%;
+  box-sizing: border-box;
   padding: 13px 18px;
   background: var(--bg-input);
   border: 1px solid rgba(255,255,255,0.08);
@@ -440,7 +442,8 @@
   color: #aaa;
 }
 
-.suggestion:hover {
+.suggestion:hover,
+.suggestion.active {
   background: #252b35;
   border-left-color: var(--gold);
   color: white;
@@ -450,6 +453,24 @@
 .guess-section {
   border-top: 1px solid var(--border-subtle);
   padding: 20px 36px 32px;
+}
+
+/* ── Music guess cards ── */
+.music-guess-card {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--bg-cell);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  animation: slideIn 0.3s ease-out;
+}
+
+.music-guess-name {
+  font-family: 'Silkscreen', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #d0d0d0;
 }
 
 /* ── Guess cards ── */
@@ -819,7 +840,7 @@
   top: 52px;
   right: 14px;
   width: 300px;
-  background: rgba(20,23,30,0.98);
+  background: rgb(20,23,30);
   border-radius: 10px;
   padding: 18px 20px;
   text-align: left;
@@ -828,7 +849,7 @@
   line-height: 1.8;
   box-shadow: 0 8px 32px rgba(0,0,0,0.5);
   border: 1px solid rgba(255,255,255,0.08);
-  z-index: 150;
+  z-index: 300;
   animation: fadeIn 0.2s ease-out;
   max-height: 70vh;
   overflow-y: auto;
@@ -861,13 +882,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 11px;
   z-index: 100;
 }
 
 .side-links-label {
   font-family: 'Silkscreen', monospace;
-  font-size: 8px;
+  font-size: 14px;
   letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--gold);
@@ -876,7 +897,7 @@
 
 .side-links-icons {
   display: flex;
-  gap: 10px;
+  gap: 18px;
   align-items: center;
 }
 
@@ -887,8 +908,8 @@
 }
 .side-link:hover { opacity: 1; }
 
-.github-icon { width: 28px; height: 28px; fill: #fff; }
-.kofi-icon   { width: 28px; height: 28px; fill: #fff; }
+.github-icon { width: 49px; height: 49px; fill: #fff; }
+.kofi-icon   { width: 49px; height: 49px; fill: #fff; }
 
 /* ── Scrollbars ── */
 html, body, .suggestions, .guess-table {
@@ -980,4 +1001,14 @@ body::-webkit-scrollbar-thumb:hover,
   .play-btn { width: 42px; height: 42px; }
 
   .help-panel { left: 8px; right: 8px; width: auto; top: 50px; }
+
+  .side-links {
+    position: static;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+    width: 100%;
+  }
 }
