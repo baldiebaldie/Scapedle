@@ -10,12 +10,15 @@ root.render(
 );
 
 // Send Core Web Vitals to GA4
-reportWebVitals(({ name, delta }) => {
+reportWebVitals(({ name, id, delta, value }) => {
   if (typeof window.gtag === 'function') {
     window.gtag('event', name, {
-      category: 'Web Vitals',
+      event_category: 'Web Vitals',
+      event_label: id,
       value: Math.round(name === 'CLS' ? delta * 1000 : delta),
-      non_interaction: true,
+      metric_id: id,
+      metric_delta: delta,
+      metric_value: value,
     });
   }
 });

@@ -225,6 +225,7 @@ function App() {
           localStorage.setItem('scapedle-daily-won', 'false');
           localStorage.removeItem('scapedle-daily-items-score');
           localStorage.removeItem('scapedle-daily-music-score');
+          gtag('event', 'game_start', { game_type: 'items', mode: 'daily' });
         }
 
         // Generate daily item locally using seeded random (fallback if Supabase has no row)

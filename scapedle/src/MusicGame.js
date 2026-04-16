@@ -9,6 +9,8 @@ import {
 } from './data/mapRegions';
 import { calculateScore } from './utils';
 
+const gtag = (...args) => { if (typeof window.gtag === 'function') window.gtag(...args); };
+
 const audioUrlCache = {};
 
 async function resolveWikiAudioUrl(filename) {
@@ -113,12 +115,15 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
       setDailyGuessHistory(newHistory);
       localStorage.setItem('scapedle-daily-region-guesses', JSON.stringify(newHistory));
 
+      gtag('event', 'music_guess', { game_type: 'music', mode: 'daily', guess_number: newHistory.length, correct: isCorrect });
+
       if (isCorrect) {
         const score = calculateScore(newHistory.length);
         setDailySongWon(true);
         localStorage.setItem('scapedle-daily-song-won', 'true');
         localStorage.setItem('scapedle-daily-music-score', String(score));
         if (onDailySongWon) onDailySongWon(score);
+        gtag('event', 'game_won', { game_type: 'music', mode: 'daily', guesses: newHistory.length, score });
         if (audioRef.current) {
           audioRef.current.pause();
           setIsPlaying(false);
@@ -128,8 +133,12 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
       const newHistory = [...unlimitedGuessHistory, newGuess];
       setUnlimitedGuessHistory(newHistory);
 
+      gtag('event', 'music_guess', { game_type: 'music', mode: 'unlimited', guess_number: newHistory.length, correct: isCorrect });
+
       if (isCorrect) {
+        const score = calculateScore(newHistory.length);
         setUnlimitedSongWon(true);
+        gtag('event', 'game_won', { game_type: 'music', mode: 'unlimited', guesses: newHistory.length, score });
         if (audioRef.current) {
           audioRef.current.pause();
           setIsPlaying(false);
@@ -173,6 +182,7 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
       }
       audioRef.current.play().then(() => {
         setAudioLoading(false);
+        gtag('event', 'audio_play', { game_type: 'music', mode: musicMode });
       }).catch(err => {
         console.error('Audio play error:', err);
         setAudioError(true);
