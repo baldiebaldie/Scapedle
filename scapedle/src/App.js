@@ -90,6 +90,10 @@ function App() {
   // Copy-result share button state
   const [copied, setCopied] = useState(false);
 
+  // Skip confirmation for unlimited items
+  const [showItemSkipConfirm, setShowItemSkipConfirm] = useState(false);
+  const [skippedItem, setSkippedItem] = useState(null);
+
   // Flash feedback via an overlay child div — never touches game-container's own animation
   const gameContainerRef = useRef(null);
   const flashOverlayRef = useRef(null);
@@ -367,11 +371,18 @@ function App() {
     setSelectedSuggestionIndex(-1);
   };
 
+  const handleItemSkipConfirmed = () => {
+    setSkippedItem(unlimitedTarget);
+    setShowItemSkipConfirm(false);
+  };
+
   const handlePlayAgain = () => {
     const randomIndex = Math.floor(Math.random() * allItems.length);
     setUnlimitedTarget(allItems[randomIndex]);
     setUnlimitedGuesses([]);
     setUnlimitedWon(false);
+    setShowItemSkipConfirm(false);
+    setSkippedItem(null);
   };
 
   const copyShareResult = () => {
@@ -388,7 +399,7 @@ function App() {
       return [gv.match, vv.match, eqM, slotM, blV.match, ryV.match]
         .map(m => m ? '🟩' : '🟥').join('');
     }).join('\n');
-    const text = `Scapedle ${gameMode === 'daily' ? 'Daily' : 'Practice'}\n${guesses.length} guess${guesses.length !== 1 ? 'es' : ''}\n${emojiGrid}\nscapedle.com`;
+    const text = `Scapedle ${gameMode === 'daily' ? 'Daily' : 'Practice'}\n${guesses.length} guess${guesses.length !== 1 ? 'es' : ''}\n${emojiGrid}\nscapedle.net`;
     navigator.clipboard.writeText(text).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -623,8 +634,32 @@ function App() {
                         )}
                       </div>
                     </div>
+                  ) : skippedItem ? (
+                    <div className="win-panel skipped-panel">
+                      <div className="skipped-label">The answer was</div>
+                      <div className="win-icon-wrap">
+                        <img src={`data:image/png;base64,${skippedItem.icon}`} alt={skippedItem.name} className="win-icon" />
+                      </div>
+                      <div className="win-item-name">{skippedItem.name}</div>
+                      <div className="win-actions">
+                        <button className="play-again-btn" onClick={handlePlayAgain}>Next Item</button>
+                      </div>
+                    </div>
                   ) : (
                     <div className="search-wrap">
+                      {gameMode === 'unlimited' && (
+                        <div className="skip-row">
+                          {showItemSkipConfirm ? (
+                            <>
+                              <span className="skip-confirm-text">Skip this item?</span>
+                              <button className="skip-confirm-yes" onClick={handleItemSkipConfirmed}>Yes</button>
+                              <button className="skip-confirm-cancel" onClick={() => setShowItemSkipConfirm(false)}>Cancel</button>
+                            </>
+                          ) : (
+                            <button className="skip-btn" onClick={() => setShowItemSkipConfirm(true)}>Skip item</button>
+                          )}
+                        </div>
+                      )}
                       <input
                         type="text"
                         value={inputValue}
@@ -715,6 +750,11 @@ function App() {
             </a>
             <a href="https://ko-fi.com/baldiebaldie" target="_blank" rel="noopener noreferrer" className="side-link" aria-label="Ko-fi">
               <img src="/kofi_favion.png" alt="Ko-fi" className="kofi-icon" />
+            </a>
+            <a href="https://x.com/scapedle" target="_blank" rel="noopener noreferrer" className="side-link" aria-label="X (Twitter)">
+              <svg className="x-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
             </a>
           </div>
         </div>
