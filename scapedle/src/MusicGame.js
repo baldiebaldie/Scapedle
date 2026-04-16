@@ -33,6 +33,8 @@ async function resolveWikiAudioUrl(filename) {
 function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, initialDailyWon, onDailySongWon, onGuessResult, dailyItemsScore, dailyMusicScore, musicMode, setMusicMode, dailyGuessHistory, setDailyGuessHistory, unlimitedGuessHistory, setUnlimitedGuessHistory }) {
   const [dailySongWon, setDailySongWon] = useState(initialDailyWon || false);
   const [unlimitedSongWon, setUnlimitedSongWon] = useState(false);
+  const [showSkipConfirm, setShowSkipConfirm] = useState(false);
+  const [skippedSong, setSkippedSong] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioProgress, setAudioProgress] = useState(0);
   const [audioError, setAudioError] = useState(false);
@@ -201,12 +203,19 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
     }
   };
 
+  const handleSkipConfirmed = () => {
+    setSkippedSong(currentSong);
+    setShowSkipConfirm(false);
+  };
+
   const handleSongPlayAgain = () => {
     const randomIndex = Math.floor(Math.random() * musicTracks.length);
     const newSong = musicTracks[randomIndex];
     setUnlimitedSong(newSong);
     setUnlimitedGuessHistory([]);
     setUnlimitedSongWon(false);
+    setShowSkipConfirm(false);
+    setSkippedSong(null);
     setIsPlaying(false);
     setAudioProgress(0);
     setAudioError(false);
@@ -340,12 +349,43 @@ function MusicGame({ dailySong, unlimitedSong, yesterdaySong, setUnlimitedSong, 
             )}
           </div>
         </div>
+      ) : skippedSong ? (
+        <div className="win-panel skipped-panel">
+          <div className="skipped-label">The answer was</div>
+          <div className="win-item-name">{skippedSong.name}</div>
+          <div className="win-stats">
+            <div className="win-stat">
+              <span className="win-stat-label">Unlocks</span>
+              <span className="win-stat-val" style={{ fontSize: '12px' }}>
+                {Array.isArray(skippedSong.location) ? skippedSong.location.join(' / ') : skippedSong.location}
+              </span>
+            </div>
+          </div>
+          <div className="win-actions">
+            <button className="play-again-btn" onClick={handleSongPlayAgain}>Next Song</button>
+          </div>
+        </div>
       ) : (
-        <OSRSMap
-          onRegionSelect={handleRegionGuess}
-          guessHistory={guessHistory}
-          disabled={songWon}
-        />
+        <>
+          {musicMode === 'unlimited' && (
+            <div className="skip-row">
+              {showSkipConfirm ? (
+                <>
+                  <span className="skip-confirm-text">Skip this song?</span>
+                  <button className="skip-confirm-yes" onClick={handleSkipConfirmed}>Yes</button>
+                  <button className="skip-confirm-cancel" onClick={() => setShowSkipConfirm(false)}>Cancel</button>
+                </>
+              ) : (
+                <button className="skip-btn" onClick={() => setShowSkipConfirm(true)}>Skip song</button>
+              )}
+            </div>
+          )}
+          <OSRSMap
+            onRegionSelect={handleRegionGuess}
+            guessHistory={guessHistory}
+            disabled={songWon}
+          />
+        </>
       )}
     </div>
   );

@@ -910,6 +910,57 @@
 
 .github-icon { width: 49px; height: 49px; fill: #fff; }
 .kofi-icon   { width: 49px; height: 49px; fill: #fff; }
+.x-icon      { width: 28px; height: 28px; fill: #fff; }
+
+/* ── Skipped reveal panel ── */
+.skipped-panel { border-color: #c62828 !important; }
+.skipped-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #c62828;
+  margin-bottom: 4px;
+}
+
+/* ── Skip row ── */
+.skip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.skip-btn {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  transition: color 0.15s;
+}
+.skip-btn:hover { color: #999; }
+.skip-confirm-text {
+  font-size: 12px;
+  color: #888;
+}
+.skip-confirm-yes, .skip-confirm-cancel {
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.skip-confirm-yes {
+  background: #c62828;
+  color: #fff;
+}
+.skip-confirm-cancel {
+  background: #2a2f3a;
+  color: #aaa;
+}
+.skip-confirm-yes:hover, .skip-confirm-cancel:hover { opacity: 0.8; }
 
 /* ── Scrollbars ── */
 html, body, .suggestions, .guess-table {
