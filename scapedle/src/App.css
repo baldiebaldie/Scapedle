@@ -489,6 +489,10 @@
 }
 
 .guess-card:hover { border-color: rgba(255,255,255,0.12); }
+.guess-card:has(.card-header.partial) {
+  border-color: rgba(255,183,77,0.45);
+  box-shadow: 0 0 10px rgba(255,183,77,0.25), 0 0 22px rgba(255,183,77,0.1);
+}
 
 .card-header {
   display: flex;
@@ -513,7 +517,8 @@
 }
 
 .card-header.correct .card-item-name { color: #81c784; }
-.card-header.partial .card-item-name { color: #ffb74d; }
+.card-header.partial { background: rgba(255,183,77,0.06); }
+.card-header.partial .card-item-name { color: #ffb74d; text-shadow: 0 0 8px rgba(255,183,77,0.7); }
 
 /* 6-column attribute grid */
 .card-attrs {
