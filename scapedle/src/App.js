@@ -417,16 +417,17 @@ function App() {
 
     const guessSlot = guess.equipment?.slot || null;
     const targetSlot = targetItem.equipment?.slot || null;
+    const formatSlot = s => s === '2h' ? '2h weapon' : s === 'weapon' ? '1h weapon' : s;
     let slotClass, slotText;
     if (guessSlot && targetSlot) {
       slotClass = guessSlot === targetSlot ? 'correct' : 'wrong';
-      slotText = guessSlot;
+      slotText = formatSlot(guessSlot);
     } else if (!guessSlot && !targetSlot) {
       slotClass = 'correct';
       slotText = '-';
     } else {
       slotClass = 'wrong';
-      slotText = guessSlot || '-';
+      slotText = guessSlot ? formatSlot(guessSlot) : '-';
     }
 
     const isCorrect = guess.id === targetItem.id;
